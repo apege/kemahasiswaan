@@ -51,11 +51,19 @@
 
         /* Header Glass */
         .header-glass {
-            position: absolute;
-            top: 24px;
+            position: fixed;
+            top: 0;
             left: 0;
             right: 0;
             z-index: 100;
+            padding: 16px 0;
+            transition: padding 0.3s ease;
+        }
+
+        .header-glass.scrolled {
+            padding: 8px 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(20px);
         }
 
         .navbar-glass {
@@ -310,7 +318,7 @@
         .berita-header .container {
             position: relative;
             z-index: 2;
-            padding: 120px 0 80px;
+            padding: 140px 0 80px;
         }
 
         .berita-header h1 {
@@ -423,7 +431,7 @@
         /* Share Buttons Sticky */
         .berita-share {
             position: sticky;
-            top: 100px;
+            top: 90px;
         }
 
         .share-title {
@@ -765,6 +773,11 @@
             .berita-meta span {
                 padding: 5px 12px;
                 font-size: 0.8rem;
+            }
+
+            /* Sticky share: disable on mobile, show inline */
+            .berita-share {
+                position: static;
             }
         }
     </style>
@@ -1131,11 +1144,14 @@
 
     // Navbar scroll effect
     window.addEventListener('scroll', () => {
+        const header = document.getElementById('mainHeader');
         const navbar = document.getElementById('navbar');
-        if (window.scrollY > 50) {
-            navbar.classList.add('scrolled');
+        if (window.scrollY > 30) {
+            if(header) header.classList.add('scrolled');
+            if(navbar) navbar.classList.add('scrolled');
         } else {
-            navbar.classList.remove('scrolled');
+            if(header) header.classList.remove('scrolled');
+            if(navbar) navbar.classList.remove('scrolled');
         }
     });
 

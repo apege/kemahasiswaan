@@ -1273,10 +1273,6 @@
       .nav-links.open { display: flex !important; }
       .mobile-toggle { display: block; }
       .hero-image-area { width: 100%; margin-top: 20px; min-height: 280px; }
-      .berita-card { position: relative; width: 100%; margin-bottom: 20px; transform: none !important; opacity: 1 !important; filter: none !important; }
-      .berita-card.active, .berita-card.right, .berita-card.left { transform: none !important; width: 100%; }
-      .carousel-nav { display: none; }
-      .carousel-dots { display: none; }
       .achievement-master { margin-top: 30px; padding: 32px 24px; }
       .hero-title h1 { font-weight: 500; }
       .org-grid-one { gap: 14px; }
@@ -1582,31 +1578,57 @@
 
 @media (max-width: 768px) {
     .berita-carousel-container {
-        padding: 20px 20px;
+        padding: 20px 16px;
+        overflow: hidden;
     }
-    
+
+    .berita-carousel {
+        min-height: 420px;
+        touch-action: pan-y;
+    }
+
+    /* On mobile: show ONLY the active card; hide all others */
     .berita-card {
-        position: relative;
-        width: 100%;
-        margin-bottom: 20px;
-        transform: none !important;
-        opacity: 1 !important;
-        filter: none !important;
+        width: calc(100% - 0px);
+        max-width: 100%;
     }
-    
-    .berita-card.active,
+
+    .berita-card.active {
+        width: 100%;
+        transform: translateX(0) scale(1);
+        opacity: 1;
+        filter: none;
+        z-index: 30;
+    }
+
     .berita-card.right,
     .berita-card.left {
-        transform: none !important;
-        width: 100%;
+        transform: translateX(0) scale(1);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 10;
     }
-    
+
+    .berita-card.right-far,
+    .berita-card.left-far {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    /* Show nav buttons on mobile as well */
     .carousel-nav {
-        display: none;
+        display: flex;
+        width: 40px;
+        height: 40px;
     }
-    
+
+    .carousel-nav.prev { left: 4px; }
+    .carousel-nav.next { right: 4px; }
+
+    /* Show dots on mobile */
     .carousel-dots {
-        display: none;
+        display: flex;
+        margin-top: 20px;
     }
 }
   </style>
@@ -2017,106 +2039,7 @@
     });
   }
 
-  // ==================== BERITA CAROUSEL ====================
-  const dummyBerita = [
-    { id:1, judul:"FIK Gelar Pameran Kreatif 2025", kategori:"berita", tgl:"2025-03-15", views:320, ringkasan:"Pameran tahunan yang menampilkan karya terbaik mahasiswa Fakultas Industri Kreatif dalam bidang desain, animasi, dan fotografi." },
-    { id:2, judul:"Pengumuman Pendaftaran Beasiswa FIK", kategori:"pengumuman", tgl:"2025-03-10", views:587, ringkasan:"Informasi lengkap mengenai jadwal, persyaratan, dan prosedur pendaftaran beasiswa bagi mahasiswa FIK tahun ajaran 2025/2026." },
-    { id:3, judul:"Webinar: Kreatif di Era AI", kategori:"artikel", tgl:"2025-03-08", views:210, ringkasan:"Webinar yang membahas tentang peran kecerdasan buatan dalam industri kreatif, dengan narasumber dari praktisi terkemuka." },
-    { id:4, judul:"Lomba Desain Poster Nasional", kategori:"berita", tgl:"2025-03-05", views:150, ringkasan:"FIK membuka pendaftaran lomba desain poster tingkat nasional dengan tema 'Keberlanjutan dan Lingkungan'." },
-    { id:5, judul:"Pengumuman Hasil Seleksi PKM", kategori:"pengumuman", tgl:"2025-03-01", views:425, ringkasan:"Daftar nama mahasiswa yang lolos seleksi Program Kreativitas Mahasiswa (PKM) gelombang pertama tahun 2025." }
-  ];
-
-  let activeNewsIdx = 0;
-  let newsCardsArray = [];
-
-  function updateCarouselPosition() {
-    const total = newsCardsArray.length;
-    if (total === 0) return;
-    newsCardsArray.forEach((card, i) => {
-      card.classList.remove('active', 'left', 'right', 'left-far', 'right-far');
-      if (i === activeNewsIdx) {
-        card.classList.add('active');
-      } else {
-        let diff = i - activeNewsIdx;
-        if (diff === -1 || (activeNewsIdx === 0 && i === total-1)) {
-          card.classList.add('left');
-        } else if (diff === 1 || (activeNewsIdx === total-1 && i === 0)) {
-          card.classList.add('right');
-        } else {
-          if ((i < activeNewsIdx && (activeNewsIdx - i) > 1) || (activeNewsIdx === 0 && i === total-1)) {
-            card.classList.add('left-far');
-          } else {
-            card.classList.add('right-far');
-          }
-        }
-      }
-    });
-    renderDotsNews();
-  }
-
-  function renderDotsNews() {
-    const dotsContainer = document.getElementById('beritaDots');
-    if (!dotsContainer) return;
-    dotsContainer.innerHTML = '';
-    for (let i = 0; i < dummyBerita.length; i++) {
-      const dotSpan = document.createElement('button');
-      dotSpan.classList.add('dot');
-      if (i === activeNewsIdx) dotSpan.classList.add('active');
-      dotSpan.addEventListener('click', () => {
-        activeNewsIdx = i;
-        updateCarouselPosition();
-      });
-      dotsContainer.appendChild(dotSpan);
-    }
-  }
-
-  function formatDate(dateString) {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('id-ID', options);
-  }
-
-  function getCategoryBadge(category) {
-    const badges = {
-      'berita': '<span class="berita-category berita">Berita</span>',
-      'pengumuman': '<span class="berita-category pengumuman">Pengumuman</span>',
-      'artikel': '<span class="berita-category artikel">Artikel</span>'
-    };
-    return badges[category] || '<span class="berita-category">Umum</span>';
-  }
-
-  function renderNewsCarousel() {
-    const container = document.getElementById('beritaCarouselContainer');
-    if (!container) return;
-    container.innerHTML = '';
-    newsCardsArray = [];
-    
-    dummyBerita.forEach((item) => {
-      const cardDiv = document.createElement('div');
-      cardDiv.className = 'berita-card';
-      
-      cardDiv.innerHTML = `
-        <div class="berita-card-inner">
-          <div class="berita-image"><i class="fas fa-newspaper fa-3x text-secondary"></i></div>
-          <div class="berita-content">
-            ${getCategoryBadge(item.kategori)}
-            <h3 class="berita-title">${item.judul}</h3>
-            <div class="berita-meta">
-              <span><i class="far fa-calendar-alt"></i> ${formatDate(item.tgl)}</span>
-              <span><i class="fas fa-eye"></i> ${item.views} views</span>
-            </div>
-            <p class="berita-excerpt">${item.ringkasan}</p>
-            <a href="#" class="berita-readmore">Selengkapnya <i class="fas fa-arrow-right"></i></a>
-          </div>
-        </div>
-      `;
-      
-      container.appendChild(cardDiv);
-      newsCardsArray.push(cardDiv);
-    });
-    
-    activeNewsIdx = 0;
-    updateCarouselPosition();
-  }
+  // (dummy news data removed – carousel now uses PHP-rendered cards below)
 
   // ==================== ANIMASI ANGKA ====================
   function animateNumber(element, finalValue, duration = 800) {
@@ -2187,63 +2110,23 @@
     }
   }
 
-  // ==================== CAROUSEL NAVIGATION ====================
-  function initCarouselNav() {
-    const prevBtn = document.getElementById('prevBerita');
-    const nextBtn = document.getElementById('nextBerita');
-    if (prevBtn) {
-      prevBtn.addEventListener('click', () => {
-        activeNewsIdx = (activeNewsIdx - 1 + dummyBerita.length) % dummyBerita.length;
-        updateCarouselPosition();
-      });
-    }
-    if (nextBtn) {
-      nextBtn.addEventListener('click', () => {
-        activeNewsIdx = (activeNewsIdx + 1) % dummyBerita.length;
-        updateCarouselPosition();
-      });
-    }
-    
-    let autoSlideInterval;
-    function startAutoSlide() {
-      if (autoSlideInterval) clearInterval(autoSlideInterval);
-      autoSlideInterval = setInterval(() => {
-        if (document.hasFocus()) {
-          activeNewsIdx = (activeNewsIdx + 1) % dummyBerita.length;
-          updateCarouselPosition();
-        }
-      }, 5000);
-    }
-    function stopAutoSlide() {
-      if (autoSlideInterval) {
-        clearInterval(autoSlideInterval);
-        autoSlideInterval = null;
-      }
-    }
-    const container = document.querySelector('.berita-carousel-container');
-    if (container) {
-      container.addEventListener('mouseenter', stopAutoSlide);
-      container.addEventListener('mouseleave', startAutoSlide);
-    }
-    startAutoSlide();
-  }
+  // ==================== CAROUSEL NAVIGATION (placeholder – actual init is below) ====================
+  function initCarouselNav() { /* handled by the DOMContentLoaded block below */ }
 
   // ==================== INITIALIZATION ====================
   document.addEventListener('DOMContentLoaded', function() {
     renderOrganizations();
     renderPartnerLogos();
-    renderRecognitionLogos();  // <-- TAMBAHAN: render logo International Recognitions
-    renderNewsCarousel();
+    renderRecognitionLogos();
     initDropdown();
     initMobileToggle();
-    initCarouselNav();
     
     window.addEventListener('scroll', checkAndAnimateNumbers);
     setTimeout(checkAndAnimateNumbers, 500);
   });
   // ==================== BERITA CAROUSEL ====================
 document.addEventListener('DOMContentLoaded', function() {
-    const cards = document.querySelectorAll('.berita-card');
+    const cards = Array.from(document.querySelectorAll('.berita-card'));
     const dots = document.querySelectorAll('.dot');
     const prevBtn = document.getElementById('prevBerita');
     const nextBtn = document.getElementById('nextBerita');
@@ -2252,26 +2135,30 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let currentIndex = 0;
     const totalCards = cards.length;
+
+    // Give each card a data-index so click-to-activate works
+    cards.forEach((card, i) => card.setAttribute('data-index', i));
     
     // Fungsi update posisi card
     function updateCarousel() {
         cards.forEach((card, index) => {
             card.classList.remove('active', 'left', 'right', 'left-far', 'right-far');
             
-            let position = index - currentIndex;
-            
-            if (position < -1) position = -2;
-            if (position > 1) position = 2;
-            
+            const diff = index - currentIndex;
+            // Wrap-around distances
+            const wrapDiff = ((diff + totalCards) % totalCards <= totalCards / 2)
+                ? (diff + totalCards) % totalCards
+                : diff - totalCards;
+
             if (index === currentIndex) {
                 card.classList.add('active');
-            } else if (position === -1 || (currentIndex === 0 && index === totalCards - 1)) {
+            } else if (wrapDiff === -1) {
                 card.classList.add('left');
-            } else if (position === 1 || (currentIndex === totalCards - 1 && index === 0)) {
+            } else if (wrapDiff === 1) {
                 card.classList.add('right');
-            } else if (position === -2) {
+            } else if (wrapDiff < -1) {
                 card.classList.add('left-far');
-            } else if (position === 2) {
+            } else {
                 card.classList.add('right-far');
             }
         });
@@ -2298,7 +2185,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (prevBtn) prevBtn.addEventListener('click', prevBerita);
     if (nextBtn) nextBtn.addEventListener('click', nextBerita);
     
-    // Event listeners untuk dots
+    // Event listeners untuk dots (PHP-rendered)
     dots.forEach((dot, index) => {
         dot.addEventListener('click', () => {
             currentIndex = index;
@@ -2306,32 +2193,41 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Ketika card diklik, arahkan ke detail berita
+    // Ketika card diklik
     cards.forEach((card) => {
         const slug = card.dataset.slug;
-        const readmoreLink = card.querySelector('.berita-readmore');
-        
         card.addEventListener('click', (e) => {
-            // Jangan trigger jika klik pada link (sudah akan redirect sendiri)
-            if (e.target.closest('.berita-readmore')) {
-                return;
-            }
-            
-            // Jika card yang diklik bukan card tengah, pindahkan ke tengah dulu
+            if (e.target.closest('.berita-readmore')) return;
             if (!card.classList.contains('active')) {
-                const index = parseInt(card.dataset.index);
-                if (!isNaN(index)) {
-                    currentIndex = index;
-                    updateCarousel();
-                }
+                const idx = parseInt(card.getAttribute('data-index'));
+                if (!isNaN(idx)) { currentIndex = idx; updateCarousel(); }
             } else {
-                // Jika sudah di tengah, redirect ke detail
-                if (slug) {
-                    window.location.href = "<?= base_url('berita/detail/') ?>" + slug;
-                }
+                if (slug) window.location.href = "<?= base_url('berita/detail/') ?>" + slug;
             }
         });
     });
+    
+    // Touch / swipe support
+    const carouselEl = document.querySelector('.berita-carousel');
+    if (carouselEl) {
+        let touchStartX = 0;
+        let touchStartY = 0;
+        carouselEl.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+        carouselEl.addEventListener('touchend', (e) => {
+            const dx = e.changedTouches[0].clientX - touchStartX;
+            const dy = e.changedTouches[0].clientY - touchStartY;
+            // Only fire if horizontal swipe is dominant
+            if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+                if (dx < 0) nextBerita();
+                else prevBerita();
+                stopAutoSlide();
+                startAutoSlide();
+            }
+        }, { passive: true });
+    }
     
     // Auto slide setiap 5 detik
     let autoSlideInterval;
@@ -2339,17 +2235,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function startAutoSlide() {
         if (autoSlideInterval) clearInterval(autoSlideInterval);
         autoSlideInterval = setInterval(() => {
-            if (document.hasFocus()) {
-                nextBerita();
-            }
+            if (document.hasFocus()) nextBerita();
         }, 5000);
     }
     
     function stopAutoSlide() {
-        if (autoSlideInterval) {
-            clearInterval(autoSlideInterval);
-            autoSlideInterval = null;
-        }
+        if (autoSlideInterval) { clearInterval(autoSlideInterval); autoSlideInterval = null; }
     }
     
     const container = document.querySelector('.berita-carousel-container');
