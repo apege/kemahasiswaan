@@ -89,6 +89,10 @@ class Proposal_model extends CI_Model {
         $this->db->insert('proposal', $data);
         $id = $this->db->insert_id();
 
+        if ($this->db->error()['code'] !== 0) {
+            log_message('error', 'DB Insert Error [proposal]: ' . json_encode($this->db->error()));
+        }
+
         if ($id && !empty($rab_items)) {
             $this->_save_rab($id, $rab_items);
         }
@@ -317,7 +321,7 @@ class Proposal_model extends CI_Model {
             'latar_belakang'     => trim($raw['latar_belakang']     ?? ''),
             'tujuan_manfaat'     => trim($raw['tujuan_manfaat']     ?? ''),
             'sasaran_kegiatan'   => trim($raw['sasaran_kegiatan']   ?? ''),
-            'peserta'            => trim($raw['peserta']            ?? ''),
+            'peserta'            => (int)($raw['peserta'] ?? 0),
             'tanggal_kegiatan'   => $raw['tanggal_kegiatan']        ?? null,
             'waktu_mulai'        => $raw['waktu_mulai']             ?? null,
             'waktu_selesai'      => $raw['waktu_selesai']           ?? null,

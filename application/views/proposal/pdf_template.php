@@ -235,6 +235,10 @@ function _ok($s) {
 function _paras($text, $cls = '') {
     $t = trim($text ?? '');
     if (!$t) return '<p>-</p>';
+    // Jika sudah mengandung tag HTML (dari TinyMCE), biarkan apa adanya
+    if ($t !== strip_tags($t)) {
+        return '<div'.($cls ? ' class="'.$cls.'"' : '').'>'.$t.'</div>';
+    }
     $out = '';
     foreach (array_filter(array_map('trim', explode("\n", $t))) as $l)
         $out .= '<p'.($cls ? ' class="'.$cls.'"' : '').'>'.htmlspecialchars($l).'</p>';

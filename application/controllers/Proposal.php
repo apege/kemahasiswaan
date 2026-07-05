@@ -102,6 +102,11 @@ class Proposal extends CI_Controller
         }
 
         $raw  = json_decode($this->input->raw_input_stream, true) ?? [];
+        // Mapping tipe_proposal dari JS ('ormawa'/'kompetisi') ke DB ('himpunan'/'bemdpm')
+        $tipe_map = ['ormawa' => 'himpunan', 'kompetisi' => 'bemdpm'];
+        if (isset($raw['tipe_proposal']) && isset($tipe_map[$raw['tipe_proposal']])) {
+            $raw['tipe_proposal'] = $tipe_map[$raw['tipe_proposal']];
+        }
         $data = $this->Proposal_model->sanitize($raw);
         $data['dibuat_oleh'] = $this->_uid();
 
@@ -139,6 +144,11 @@ class Proposal extends CI_Controller
         }
 
         $raw  = json_decode($this->input->raw_input_stream, true) ?? [];
+        // Mapping tipe_proposal dari JS ('ormawa'/'kompetisi') ke DB ('himpunan'/'bemdpm')
+        $tipe_map = ['ormawa' => 'himpunan', 'kompetisi' => 'bemdpm'];
+        if (isset($raw['tipe_proposal']) && isset($tipe_map[$raw['tipe_proposal']])) {
+            $raw['tipe_proposal'] = $tipe_map[$raw['tipe_proposal']];
+        }
         $data = $this->Proposal_model->sanitize($raw);
         $data['dibuat_oleh'] = $this->_uid();
 

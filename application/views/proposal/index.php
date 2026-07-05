@@ -1499,6 +1499,10 @@
             }
         }
     </style>
+
+    <!-- TinyMCE (self-hosted via CDN, tidak perlu API key) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js" referrerpolicy="origin"></script>
+
 </head>
 
 <body>
@@ -1596,10 +1600,10 @@
 
             <!-- ===== TAB SWITCHER ===== -->
             <div class="tab-switcher" data-aos="fade-up">
-                <button class="tab-btn active" onclick="switchProposalType('ormawa', this)">
+                <button class="tab-btn active" data-type="ormawa" onclick="switchProposalType('ormawa', this)">
                     <i class="fas fa-users"></i> Proposal Kegiatan Ormawa
                 </button>
-                <button class="tab-btn" onclick="switchProposalType('kompetisi', this)">
+                <button class="tab-btn" data-type="kompetisi" onclick="switchProposalType('kompetisi', this)">
                     <i class="fas fa-trophy"></i> Proposal Kompetisi
                 </button>
             </div>
@@ -1729,17 +1733,17 @@
                             <div class="row g-3">
                                 <div class="col-12">
                                     <label class="form-label">Latar Belakang <span class="required">*</span></label>
-                                    <textarea class="form-control" id="f_latar_belakang" rows="5" placeholder="Jelaskan alasan mengapa kegiatan ini perlu dilaksanakan..." maxlength="1500"></textarea>
+                                    <textarea class="form-control tinymce-editor" id="f_latar_belakang" rows="5" placeholder="Jelaskan alasan mengapa kegiatan ini perlu dilaksanakan..."></textarea>
                                     <div class="char-counter"><span id="cc_latar">0</span> / 1500</div>
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label">Tujuan & Manfaat <span class="required">*</span></label>
-                                    <textarea class="form-control" id="f_tujuan" rows="4" placeholder="1. Tujuan Pertama&#10;2. Tujuan Kedua&#10;3. Manfaat bagi peserta..." maxlength="1000"></textarea>
+                                    <textarea class="form-control tinymce-editor" id="f_tujuan" rows="4" placeholder="1. Tujuan Pertama&#10;2. Tujuan Kedua&#10;3. Manfaat bagi peserta..."></textarea>
                                     <div class="char-counter"><span id="cc_tujuan">0</span> / 1000</div>
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label">Sasaran Kegiatan <span class="required">*</span></label>
-                                    <textarea class="form-control" id="f_sasaran" rows="3" placeholder="Mahasiswa FIK, Dosen, Komunitas Eksternal..." maxlength="500"></textarea>
+                                    <textarea class="form-control tinymce-editor" id="f_sasaran" rows="3" placeholder="Mahasiswa FIK, Dosen, Komunitas Eksternal..."></textarea>
                                     <div class="char-counter"><span id="cc_sasaran">0</span> / 500</div>
                                 </div>
                             </div>
@@ -2020,7 +2024,31 @@
         }
 
         // Attach char counter events
+        function initTinyMCE() {
+            const selector = 'textarea.tinymce-editor';
+            if (document.querySelector(selector) && typeof tinymce !== 'undefined') {
+                tinymce.init({
+                    selector: selector,
+                    height: 300,
+                    menubar: false,
+                    plugins: 'lists link image preview',
+                    toolbar: 'undo redo | bold italic underline | bullist numlist | removeformat',
+                    branding: false,
+                    promotion: false,
+                    setup: function (editor) {
+                        editor.on('change', function () {
+                            const id = editor.id;
+                            const charCount = editor.getContent({ format: 'text' }).length;
+                            const ccEl = document.getElementById('cc_' + id.replace('f_', ''));
+                            if (ccEl) ccEl.textContent = charCount + ' karakter';
+                        });
+                    }
+                });
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
+            initTinyMCE();
             const latar = document.getElementById('f_latar_belakang');
             const tujuan = document.getElementById('f_tujuan');
             const sasaran = document.getElementById('f_sasaran');
@@ -2150,6 +2178,13 @@
 
             editingId = id;
             isResubmit = resubmit;
+            // Set tipe proposal sesuai dengan data
+            if (p.type) {
+                currentProposalType = p.type;
+                document.querySelectorAll('.tab-btn').forEach(function (b) {
+                    b.classList.toggle('active', b.dataset.type === p.type);
+                });
+            }
             fillFormData(p);
 
             document.getElementById('view-list').classList.add('d-none');
@@ -2259,8 +2294,14 @@
 
             const fields = requiredFields[step] || [];
             for (const fieldId of fields) {
+                let val = '';
                 const el = document.getElementById(fieldId);
-                if (!el || !el.value.trim()) {
+                if (typeof tinymce !== 'undefined' && tinymce.get(fieldId)) {
+                    val = tinymce.get(fieldId).getContent({ format: 'text' }).trim();
+                } else if (el) {
+                    val = el.value.trim();
+                }
+                if (!val) {
                     showToast(`${labels[fieldId] || 'Field'} wajib diisi`, 'error');
                     if (el) el.focus();
                     return false;
@@ -2272,6 +2313,10 @@
         // ==================== REVIEW ====================
         function populateReview() {
             const getVal = (id, fallback = '-') => {
+                if (typeof tinymce !== 'undefined' && tinymce.get(id)) {
+                    const c = tinymce.get(id).getContent({ format: 'text' }).trim();
+                    return c || fallback;
+                }
                 const el = document.getElementById(id);
                 return el && el.value.trim() ? el.value.trim() : fallback;
             };
@@ -2313,6 +2358,15 @@
         }
 
         // ==================== FORM HELPERS ====================
+        function setTinyMCEContent(id, content) {
+            if (typeof tinymce !== 'undefined' && tinymce.get(id)) {
+                tinymce.get(id).setContent(content || '');
+            } else {
+                const el = document.getElementById(id);
+                if (el) el.value = content || '';
+            }
+        }
+
         function fillFormData(p) {
             const setVal = (id, val) => {
                 const el = document.getElementById(id);
@@ -2324,9 +2378,9 @@
             setVal('f_jenis', p.jenis);
             setVal('f_nama_kegiatan', p.nama_kegiatan);
             setVal('f_balai', p.balai);
-            setVal('f_latar_belakang', p.latar_belakang);
-            setVal('f_tujuan', p.tujuan);
-            setVal('f_sasaran', p.sasaran);
+            setTinyMCEContent('f_latar_belakang', p.latar_belakang);
+            setTinyMCEContent('f_tujuan', p.tujuan);
+            setTinyMCEContent('f_sasaran', p.sasaran);
             setVal('f_tanggal', p.tanggal);
             setVal('f_waktu_mulai', p.waktu_mulai);
             setVal('f_waktu_selesai', p.waktu_selesai);
@@ -2335,7 +2389,7 @@
             setVal('f_panitia', p.panitia);
             setVal('f_rundown', p.rundown);
             setVal('f_sumber_dana', p.sumber_dana);
-            setVal('f_dana_ajukan', p.dana_ajukan);
+            setVal('f_dana_ajukan', p.dana_diajukan);
         }
 
         function resetForm() {
@@ -2348,6 +2402,13 @@
                 const el = document.getElementById(id);
                 if (el) el.value = '';
             });
+            // Clear TinyMCE editors
+            if (typeof tinymce !== 'undefined') {
+                ['f_latar_belakang', 'f_tujuan', 'f_sasaran'].forEach(function (id) {
+                    var ed = tinymce.get(id);
+                    if (ed) ed.setContent('');
+                });
+            }
             const budgetRows = document.getElementById('budget-rows');
             if (budgetRows) budgetRows.innerHTML = '';
             budgetRowCount = 0;
@@ -2437,9 +2498,9 @@
                 tema_kegiatan: document.getElementById('f_tema')?.value || '', // Cocok dengan $raw['tema_kegiatan']
                 jenis_kegiatan: document.getElementById('f_jenis')?.value || '', // Cocok dengan $raw['jenis_kegiatan']
                 balai_divisi: document.getElementById('f_balai')?.value || '', // Cocok dengan $raw['balai_divisi']
-                latar_belakang: document.getElementById('f_latar_belakang')?.value || '',
-                tujuan_manfaat: document.getElementById('f_tujuan')?.value || '', // Cocok dengan $raw['tujuan_manfaat']
-                sasaran_kegiatan: document.getElementById('f_sasaran')?.value || '', // Cocok dengan $raw['sasaran_kegiatan']
+                latar_belakang: (typeof tinymce !== 'undefined' && tinymce.get('f_latar_belakang')) ? tinymce.get('f_latar_belakang').getContent() : (document.getElementById('f_latar_belakang')?.value || ''),
+                tujuan_manfaat: (typeof tinymce !== 'undefined' && tinymce.get('f_tujuan')) ? tinymce.get('f_tujuan').getContent() : (document.getElementById('f_tujuan')?.value || ''),
+                sasaran_kegiatan: (typeof tinymce !== 'undefined' && tinymce.get('f_sasaran')) ? tinymce.get('f_sasaran').getContent() : (document.getElementById('f_sasaran')?.value || ''),
                 peserta: document.getElementById('f_peserta')?.value || '',
                 tanggal_kegiatan: document.getElementById('f_tanggal')?.value || null, // Cocok dengan $raw['tanggal_kegiatan']
                 waktu_mulai: document.getElementById('f_waktu_mulai')?.value || null,
@@ -2540,22 +2601,29 @@
                     if (result.status === 'success') {
                         proposals = (result.data || []).map(p => ({
                             id: p.id,
+                            kode: p.kode_proposal,
                             nama_kegiatan: p.nama_kegiatan,
                             ormawa: p.nama_ormawa,
+                            tahun: p.tahun_kegiatan,
+                            tema: p.tema_kegiatan,
+                            jenis: p.jenis_kegiatan,
+                            balai: p.balai_divisi,
                             tanggal: p.tanggal_kegiatan,
                             waktu_mulai: p.waktu_mulai,
                             waktu_selesai: p.waktu_selesai,
                             lokasi: p.lokasi_kegiatan,
-                            jenis: p.jenis_kegiatan,
                             peserta: p.peserta,
                             latar_belakang: p.latar_belakang,
                             tujuan: p.tujuan_manfaat,
                             sasaran: p.sasaran_kegiatan,
+                            panitia: p.susunan_panitia,
+                            rundown: p.susunan_acara,
                             total_rab: p.total_rab,
                             sumber_dana: p.sumber_dana,
                             dana_diajukan: p.dana_diajukan,
                             catatan_admin: p.catatan_admin,
                             status: p.status || 'draft',
+                            tipe: p.tipe_proposal,
                             type: p.tipe_proposal === 'himpunan' ? 'ormawa' : 'kompetisi'
                         }));
                         renderProposalList();
@@ -2637,9 +2705,11 @@
                     <div class="detail-section">
                         <div class="detail-section-title"><i class="fas fa-scroll"></i> Pendahuluan</div>
                         <div class="detail-label mb-1">Latar Belakang</div>
-                        <div class="detail-text-block">${escapeHtml(p.latar_belakang || '-').replace(/\n/g, '<br>')}</div>
+                        <div class="detail-text-block" id="detail-latar-belakang"></div>
                         <div class="detail-label mt-3 mb-1">Tujuan & Manfaat</div>
-                        <div class="detail-text-block">${escapeHtml(p.tujuan || '-').replace(/\n/g, '<br>')}</div>
+                        <div class="detail-text-block" id="detail-tujuan"></div>
+                        <div class="detail-label mt-3 mb-1">Sasaran Kegiatan</div>
+                        <div class="detail-text-block" id="detail-sasaran"></div>
                     </div>
                     <div class="detail-section">
                         <div class="detail-section-title"><i class="fas fa-coins"></i> Anggaran</div>
@@ -2650,6 +2720,14 @@
                         </div>
                     </div>
                 `;
+                // Render HTML dari TinyMCE sebagai HTML, bukan teks escaped
+                const setHtml = function (id, content) {
+                    const el = document.getElementById(id);
+                    if (el) el.innerHTML = content || '-';
+                };
+                setHtml('detail-latar-belakang', p.latar_belakang);
+                setHtml('detail-tujuan', p.tujuan);
+                setHtml('detail-sasaran', p.sasaran);
             }
 
             const footerEl = document.getElementById('detail-modal-footer');
