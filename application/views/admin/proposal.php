@@ -1218,7 +1218,20 @@ function submitReject() {
             document.getElementById('rejectError').style.display = 'none';
             
             new bootstrap.Modal(document.getElementById('modalReject')).show();
-                            }
+        }
+
+        // Handle query param ?action=detail&id=N
+        document.addEventListener('DOMContentLoaded', function() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('action') === 'detail' && params.get('id')) {
+                const check = setInterval(function() {
+                    if (typeof proposals !== 'undefined' && proposals.length > 0) {
+                        clearInterval(check);
+                        openDetail(params.get('id'));
+                    }
+                }, 200);
+            }
+        });
     </script>
 </body>
 </html>

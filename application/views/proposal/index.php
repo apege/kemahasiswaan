@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
@@ -9,7 +10,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    
+
     <!-- AOS Animation -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
 
@@ -43,10 +44,12 @@
         ::-webkit-scrollbar {
             width: 8px;
         }
+
         ::-webkit-scrollbar-track {
             background: #f1f1f1;
             border-radius: 10px;
         }
+
         ::-webkit-scrollbar-thumb {
             background: var(--orange);
             border-radius: 10px;
@@ -59,17 +62,33 @@
 
         /* ========== ANIMATIONS ========== */
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
+
         @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
         }
-        
+
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* ========== HEADER GLASS ========== */
@@ -87,7 +106,7 @@
             backdrop-filter: blur(20px);
             border-radius: 60px;
             padding: 12px 32px;
-            border: 1px solid rgba(255,255,255,0.15);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -98,7 +117,7 @@
         .navbar-glass.scrolled {
             background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(25px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
         .logo-area {
@@ -118,7 +137,7 @@
             color: white;
             font-weight: bold;
             font-size: 1.4rem;
-            box-shadow: 0 6px 12px rgba(249,115,22,0.3);
+            box-shadow: 0 6px 12px rgba(249, 115, 22, 0.3);
         }
 
         .logo-text h5 {
@@ -131,7 +150,7 @@
 
         .logo-text span {
             font-size: 0.7rem;
-            color: rgba(255,255,255,0.85);
+            color: rgba(255, 255, 255, 0.85);
         }
 
         .nav-links {
@@ -171,7 +190,7 @@
         .nav-item-dropdown {
             position: relative;
         }
-        
+
         .dropdown-menu-custom {
             position: absolute;
             top: 100%;
@@ -181,20 +200,20 @@
             border-radius: 20px;
             padding: 0.8rem 0;
             min-width: 240px;
-            border: 1px solid rgba(255,255,255,0.15);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             opacity: 0;
             visibility: hidden;
             transform: translateY(-10px);
             transition: all 0.3s ease;
             z-index: 1000;
         }
-        
+
         .nav-item-dropdown:hover .dropdown-menu-custom {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
         }
-        
+
         .dropdown-menu-custom a {
             display: flex;
             align-items: center;
@@ -205,29 +224,29 @@
             transition: all 0.2s ease;
             font-weight: 500;
         }
-        
+
         .dropdown-menu-custom a::after {
             display: none;
         }
-        
+
         .dropdown-menu-custom a:hover {
-            background: rgba(249,115,22,0.3);
+            background: rgba(249, 115, 22, 0.3);
             color: var(--orange);
             padding-left: 28px;
         }
-        
+
         .dropdown-menu-custom i {
             width: 24px;
             font-size: 1.1rem;
             color: var(--orange);
         }
-        
+
         .dropdown-toggle-icon {
             margin-left: 6px;
             font-size: 0.7rem;
             transition: transform 0.3s ease;
         }
-        
+
         .nav-item-dropdown:hover .dropdown-toggle-icon {
             transform: rotate(180deg);
         }
@@ -260,8 +279,8 @@
 
         .mobile-toggle {
             display: none;
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 12px;
             padding: 8px 14px;
             font-size: 1.4rem;
@@ -271,7 +290,7 @@
         }
 
         .mobile-toggle:hover {
-            background: rgba(255,255,255,0.25);
+            background: rgba(255, 255, 255, 0.25);
         }
 
         /* ========== HERO SECTION ========== */
@@ -287,7 +306,7 @@
             content: "";
             position: absolute;
             inset: 0;
-            background-image: radial-gradient(circle at 20% 30%, rgba(255,255,200,0.2) 2px, transparent 2.5px);
+            background-image: radial-gradient(circle at 20% 30%, rgba(255, 255, 200, 0.2) 2px, transparent 2.5px);
             background-size: 32px 32px;
             pointer-events: none;
         }
@@ -308,12 +327,12 @@
             position: relative;
             z-index: 1;
             font-family: 'Playfair Display', serif;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
             animation: fadeInUp 0.8s ease;
         }
 
         .hero-proposal p {
-            color: rgba(255,255,255,0.95);
+            color: rgba(255, 255, 255, 0.95);
             font-size: 1.2rem;
             text-align: center;
             max-width: 700px;
@@ -330,35 +349,35 @@
             pointer-events: none;
             overflow: hidden;
         }
-        
+
         .floating-elements .element {
             position: absolute;
             opacity: 0.15;
             color: white;
             animation: float 6s ease-in-out infinite;
         }
-        
+
         .floating-elements .element:nth-child(1) {
             top: 15%;
             left: 5%;
             font-size: 3rem;
             animation-delay: 0s;
         }
-        
+
         .floating-elements .element:nth-child(2) {
             top: 60%;
             right: 8%;
             font-size: 2.5rem;
             animation-delay: 1s;
         }
-        
+
         .floating-elements .element:nth-child(3) {
             bottom: 20%;
             left: 10%;
             font-size: 2rem;
             animation-delay: 0.5s;
         }
-        
+
         .floating-elements .element:nth-child(4) {
             top: 30%;
             right: 15%;
@@ -423,7 +442,7 @@
             border-color: var(--orange);
             color: var(--orange);
             transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(249,115,22,0.1);
+            box-shadow: 0 6px 12px rgba(249, 115, 22, 0.1);
         }
 
         .tab-switcher .tab-btn.active {
@@ -496,12 +515,12 @@
             gap: 10px;
             text-decoration: none;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(249,115,22,0.2);
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
         }
 
         .btn-create:hover {
             transform: translateY(-3px);
-            box-shadow: 0 12px 24px rgba(249,115,22,0.35);
+            box-shadow: 0 12px 24px rgba(249, 115, 22, 0.35);
             color: white;
         }
 
@@ -517,7 +536,7 @@
         }
 
         .empty-state:hover {
-            box-shadow: 0 25px 50px -12px rgba(249,115,22,0.15);
+            box-shadow: 0 25px 50px -12px rgba(249, 115, 22, 0.15);
         }
 
         .empty-state .icon-wrapper {
@@ -559,7 +578,7 @@
         }
 
         .proposal-table-wrap:hover {
-            box-shadow: 0 25px 50px -12px rgba(249,115,22,0.15);
+            box-shadow: 0 25px 50px -12px rgba(249, 115, 22, 0.15);
         }
 
         .proposal-table {
@@ -607,11 +626,30 @@
             display: inline-block;
         }
 
-        .status-draft    { background: #e8f4fd; color: #2980b9; }
-        .status-review   { background: #fff3e0; color: #f97316; }
-        .status-approved { background: #d1fae5; color: #065f46; }
-        .status-rejected { background: #fee2e2; color: #991b1b; }
-        .status-revision { background: #f3e8ff; color: #8e44ad; }
+        .status-draft {
+            background: #e8f4fd;
+            color: #2980b9;
+        }
+
+        .status-review {
+            background: #fff3e0;
+            color: #f97316;
+        }
+
+        .status-approved {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-revision {
+            background: #f3e8ff;
+            color: #8e44ad;
+        }
 
         /* ========== ACTION BUTTONS ========== */
         .btn-action {
@@ -633,25 +671,68 @@
             transform: translateY(-2px);
         }
 
-        .btn-view-pdf  { background: #e8f4fd; color: #2980b9; }
-        .btn-view-pdf:hover  { background: #2980b9; color: white; }
+        .btn-view-pdf {
+            background: #e8f4fd;
+            color: #2980b9;
+        }
 
-        .btn-download-pdf { background: #d1fae5; color: #065f46; }
-        .btn-download-pdf:hover { background: #065f46; color: white; }
+        .btn-view-pdf:hover {
+            background: #2980b9;
+            color: white;
+        }
 
-        .btn-edit-prop { background: #fff3e0; color: #f97316; }
-        .btn-edit-prop:hover { background: #f97316; color: white; }
+        .btn-download-pdf {
+            background: #d1fae5;
+            color: #065f46;
+        }
 
-        .btn-resubmit { background: #fee2e2; color: #991b1b; }
-        .btn-resubmit:hover { background: #991b1b; color: white; }
+        .btn-download-pdf:hover {
+            background: #065f46;
+            color: white;
+        }
 
-        .btn-delete-prop { background: #fee2e2; color: #991b1b; }
-        .btn-delete-prop:hover { background: #991b1b; color: white; }
+        .btn-edit-prop {
+            background: #fff3e0;
+            color: #f97316;
+        }
 
-        .btn-detail-prop { background: #e8f0fe; color: #3b5bdb; }
-        .btn-detail-prop:hover { background: #3b5bdb; color: white; }
+        .btn-edit-prop:hover {
+            background: #f97316;
+            color: white;
+        }
 
-        .btn-pdf-disabled, .btn-edit-disabled {
+        .btn-resubmit {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .btn-resubmit:hover {
+            background: #991b1b;
+            color: white;
+        }
+
+        .btn-delete-prop {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .btn-delete-prop:hover {
+            background: #991b1b;
+            color: white;
+        }
+
+        .btn-detail-prop {
+            background: #e8f0fe;
+            color: #3b5bdb;
+        }
+
+        .btn-detail-prop:hover {
+            background: #3b5bdb;
+            color: white;
+        }
+
+        .btn-pdf-disabled,
+        .btn-edit-disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
@@ -687,7 +768,7 @@
 
         .form-header #step-indicator {
             font-size: 0.85rem;
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
         }
 
         /* ========== STEP PROGRESS ========== */
@@ -785,8 +866,15 @@
         }
 
         @keyframes fadeStep {
-            from { opacity: 0; transform: translateX(20px); }
-            to { opacity: 1; transform: translateX(0); }
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         .form-section-title {
@@ -825,7 +913,8 @@
             font-weight: 700;
         }
 
-        .form-control, .form-select {
+        .form-control,
+        .form-select {
             border: 2px solid #e2e8f0;
             border-radius: 14px;
             padding: 12px 16px;
@@ -834,7 +923,8 @@
             background: #faf9f7;
         }
 
-        .form-control:focus, .form-select:focus {
+        .form-control:focus,
+        .form-select:focus {
             border-color: var(--orange);
             box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.1);
             background: white;
@@ -948,7 +1038,7 @@
 
         .review-card:hover {
             border-color: var(--orange);
-            box-shadow: 0 8px 20px rgba(249,115,22,0.1);
+            box-shadow: 0 8px 20px rgba(249, 115, 22, 0.1);
         }
 
         .review-card h6 {
@@ -1081,8 +1171,15 @@
         }
 
         @keyframes slideInToast {
-            from { transform: translateX(100px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         #loading-indicator {
@@ -1092,7 +1189,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(8px);
             z-index: 10000;
             justify-content: center;
@@ -1255,22 +1352,22 @@
             padding: 40px 0 20px;
             margin-top: 60px;
         }
-        
+
         .footer a {
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
             transition: color 0.2s;
         }
-        
+
         .footer a:hover {
             color: var(--orange);
         }
-        
+
         .footer-bottom {
             text-align: center;
             padding-top: 20px;
             margin-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         /* ========== RESPONSIVE ========== */
@@ -1284,10 +1381,12 @@
             .header-glass {
                 top: 12px;
             }
+
             .navbar-glass {
                 padding: 12px 20px;
                 border-radius: 40px;
             }
+
             .nav-links {
                 display: none;
                 flex-direction: column;
@@ -1296,12 +1395,15 @@
                 gap: 16px;
                 width: 100%;
             }
+
             .nav-links.open {
                 display: flex !important;
             }
+
             .mobile-toggle {
                 display: block;
             }
+
             .dropdown-menu-custom {
                 position: static;
                 opacity: 1;
@@ -1313,66 +1415,84 @@
                 padding-left: 20px;
                 border: none;
             }
+
             .dropdown-menu-custom.show-mobile {
                 display: block;
             }
+
             .hero-proposal {
                 padding: 120px 0 60px;
             }
+
             .hero-proposal h1 {
                 font-size: 2rem;
             }
+
             .hero-proposal p {
                 font-size: 1rem;
             }
+
             .tab-switcher {
                 flex-direction: column;
                 gap: 12px;
                 padding: 0 16px;
             }
+
             .tab-switcher .tab-btn {
                 width: 100%;
                 justify-content: center;
             }
+
             .proposal-list-header {
                 flex-direction: column;
                 align-items: stretch;
                 text-align: center;
             }
+
             .proposal-table-wrap {
                 overflow-x: auto;
             }
+
             .proposal-table {
                 min-width: 800px;
             }
+
             .form-body {
                 padding: 16px;
             }
+
             .step-progress {
                 padding: 16px 20px;
             }
+
             .steps-row .step-label {
                 display: none;
             }
+
             .form-navigation {
                 flex-direction: column;
                 align-items: stretch;
             }
+
             .review-row {
                 flex-direction: column;
                 gap: 2px;
             }
+
             .review-label {
                 min-width: auto;
             }
+
             .container-custom {
                 width: min(100% - 1.5rem, 1280px);
             }
+
             .toast-container {
                 bottom: 16px;
                 right: 16px;
                 left: 16px;
             }
+
             .custom-toast {
                 min-width: auto;
                 width: calc(100% - 32px);
@@ -1380,6 +1500,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <!-- ========== LOADING INDICATOR ========== -->
@@ -1401,11 +1522,11 @@
                         <span>Fakultas Industri Kreatif</span>
                     </div>
                 </div>
-                
+
                 <div class="nav-links" id="navLinks">
                     <a href="<?= base_url('dashboard') ?>">Dashboard</a>
                     <a href="<?= base_url('berita') ?>">Informasi</a>
-                    
+
                     <!-- Dropdown Layanan -->
                     <div class="nav-item-dropdown">
                         <a href="#">Layanan <i class="fas fa-chevron-down dropdown-toggle-icon"></i></a>
@@ -1417,16 +1538,16 @@
                             <a href="<?= base_url('forum_alumni') ?>"><i class="fas fa-users"></i> Layanan Alumni</a>
                         </div>
                     </div>
-                    
+
                     <a href="#">Forum Alumni</a>
                 </div>
-                
-                <?php 
+
+                <?php
                 $is_logged_in = isset($user_data) && is_array($user_data) && isset($user_data['logged_in']) && $user_data['logged_in'] === true;
-                if($is_logged_in): 
+                if ($is_logged_in):
                 ?>
                     <a href="<?= base_url('dashboard/profile') ?>" class="btn-mytelu-custom">
-                        <?php if(!empty($user_data['foto'])): ?>
+                        <?php if (!empty($user_data['foto'])): ?>
                             <img src="<?= base_url('uploads/users/' . $user_data['foto']) ?>" class="user-avatar-small">
                         <?php else: ?>
                             <i class="fas fa-user-circle"></i>
@@ -1438,7 +1559,7 @@
                         <i class="fas fa-sign-in-alt"></i> MyTeLU
                     </a>
                 <?php endif; ?>
-                
+
                 <button class="mobile-toggle" id="mobileNavBtn"><i class="fas fa-bars"></i></button>
             </div>
         </div>
@@ -1466,7 +1587,7 @@
     <!-- ========== MAIN CONTENT ========== -->
     <section class="proposal-section">
         <div class="container-custom">
-            
+
             <!-- ===== SECTION TITLE ===== -->
             <div class="section-title" data-aos="fade-up">
                 <h2>Kelola Proposal</h2>
@@ -1815,36 +1936,40 @@
 
     <script>
         // Initialize AOS
-        AOS.init({ duration: 800, once: true, offset: 50 });
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 50
+        });
 
         // BASE_URL from PHP
         var BASE_URL = '<?= base_url() ?>';
-        
+
         // ==================== MOBILE TOGGLE ====================
         const mobileBtn = document.getElementById('mobileNavBtn');
         const navLinksDiv = document.getElementById('navLinks');
         if (mobileBtn) {
             mobileBtn.addEventListener('click', () => {
                 navLinksDiv.classList.toggle('open');
-                
-                if(navLinksDiv.classList.contains('open')) {
+
+                if (navLinksDiv.classList.contains('open')) {
                     const dropdown = document.querySelector('.nav-item-dropdown .dropdown-menu-custom');
-                    if(dropdown) dropdown.classList.add('show-mobile');
+                    if (dropdown) dropdown.classList.add('show-mobile');
                 } else {
                     const dropdown = document.querySelector('.nav-item-dropdown .dropdown-menu-custom');
-                    if(dropdown) dropdown.classList.remove('show-mobile');
+                    if (dropdown) dropdown.classList.remove('show-mobile');
                 }
             });
         }
 
         // Mobile dropdown toggle
-        if(window.innerWidth <= 768) {
+        if (window.innerWidth <= 768) {
             const dropdownToggle = document.querySelector('.nav-item-dropdown > a');
-            if(dropdownToggle) {
+            if (dropdownToggle) {
                 dropdownToggle.addEventListener('click', function(e) {
                     e.preventDefault();
                     const dropdownMenu = document.querySelector('.nav-item-dropdown .dropdown-menu-custom');
-                    if(dropdownMenu) dropdownMenu.classList.toggle('show-mobile');
+                    if (dropdownMenu) dropdownMenu.classList.toggle('show-mobile');
                 });
             }
         }
@@ -1899,9 +2024,15 @@
             const latar = document.getElementById('f_latar_belakang');
             const tujuan = document.getElementById('f_tujuan');
             const sasaran = document.getElementById('f_sasaran');
-            if (latar) latar.addEventListener('input', function() { updateCharCount(this, 'cc_latar'); });
-            if (tujuan) tujuan.addEventListener('input', function() { updateCharCount(this, 'cc_tujuan'); });
-            if (sasaran) sasaran.addEventListener('input', function() { updateCharCount(this, 'cc_sasaran'); });
+            if (latar) latar.addEventListener('input', function() {
+                updateCharCount(this, 'cc_latar');
+            });
+            if (tujuan) tujuan.addEventListener('input', function() {
+                updateCharCount(this, 'cc_tujuan');
+            });
+            if (sasaran) sasaran.addEventListener('input', function() {
+                updateCharCount(this, 'cc_sasaran');
+            });
         });
 
         // ==================== TAB SWITCH ====================
@@ -1916,7 +2047,11 @@
         function formatDate(d) {
             if (!d) return '-';
             const date = new Date(d);
-            return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+            return date.toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            });
         }
 
         function escapeHtml(text) {
@@ -1950,12 +2085,27 @@
                 const isDitolak = status === 'ditolak';
 
                 const statusMap = {
-                    'draft': { cls: 'status-draft', label: 'Draft' },
-                    'submitted': { cls: 'status-review', label: 'Diajukan' },
-                    'disetujui': { cls: 'status-approved', label: 'Disetujui' },
-                    'ditolak': { cls: 'status-rejected', label: 'Ditolak' }
+                    'draft': {
+                        cls: 'status-draft',
+                        label: 'Draft'
+                    },
+                    'submitted': {
+                        cls: 'status-review',
+                        label: 'Diajukan'
+                    },
+                    'disetujui': {
+                        cls: 'status-approved',
+                        label: 'Disetujui'
+                    },
+                    'ditolak': {
+                        cls: 'status-rejected',
+                        label: 'Ditolak'
+                    }
                 };
-                const st = statusMap[status] || { cls: 'status-draft', label: status };
+                const st = statusMap[status] || {
+                    cls: 'status-draft',
+                    label: status
+                };
 
                 return `
                     <tr>
@@ -2019,25 +2169,27 @@
         function deleteProposal(id) {
             if (!confirm('Yakin ingin menghapus proposal ini?')) return;
             showLoading(true);
-            
+
             fetch(BASE_URL + 'proposal/hapus/' + id, {
-                method: 'POST',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            })
-            .then(response => response.json())
-            .then(result => {
-                showLoading(false);
-                if (result.status === 'success') {
-                    showToast(result.message, 'success');
-                    loadProposalsFromServer();
-                } else {
-                    showToast(result.message || 'Gagal menghapus', 'error');
-                }
-            })
-            .catch(error => {
-                showLoading(false);
-                showToast('Terjadi kesalahan koneksi', 'error');
-            });
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(result => {
+                    showLoading(false);
+                    if (result.status === 'success') {
+                        showToast(result.message, 'success');
+                        loadProposalsFromServer();
+                    } else {
+                        showToast(result.message || 'Gagal menghapus', 'error');
+                    }
+                })
+                .catch(error => {
+                    showLoading(false);
+                    showToast('Terjadi kesalahan koneksi', 'error');
+                });
         }
 
         // ==================== STEP NAVIGATION ====================
@@ -2055,11 +2207,11 @@
 
             const stepIndicator = document.getElementById('step-indicator');
             if (stepIndicator) stepIndicator.textContent = `Langkah ${n} dari ${totalSteps}`;
-            
+
             const btnPrev = document.getElementById('btn-prev');
             const btnNext = document.getElementById('btn-next');
             const btnSubmit = document.getElementById('btn-submit');
-            
+
             if (btnPrev) btnPrev.classList.toggle('d-none', n === 1);
             if (btnNext) btnNext.classList.toggle('d-none', n === totalSteps);
             if (btnSubmit) btnSubmit.classList.toggle('d-none', n !== totalSteps);
@@ -2067,7 +2219,10 @@
             if (n === totalSteps) populateReview();
 
             currentStep = n;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         }
 
         function nextStep() {
@@ -2084,9 +2239,10 @@
                 1: ['f_ormawa', 'f_tahun', 'f_nama_kegiatan', 'f_jenis'],
                 2: ['f_latar_belakang', 'f_tujuan', 'f_sasaran'],
                 3: ['f_tanggal', 'f_waktu_mulai', 'f_lokasi', 'f_panitia'],
-                4: [], 5: []
+                4: [],
+                5: []
             };
-            
+
             const labels = {
                 'f_ormawa': 'Nama Ormawa',
                 'f_tahun': 'Tahun Kegiatan',
@@ -2100,7 +2256,7 @@
                 'f_lokasi': 'Lokasi',
                 'f_panitia': 'Susunan Panitia'
             };
-            
+
             const fields = requiredFields[step] || [];
             for (const fieldId of fields) {
                 const el = document.getElementById(fieldId);
@@ -2119,7 +2275,7 @@
                 const el = document.getElementById(id);
                 return el && el.value.trim() ? el.value.trim() : fallback;
             };
-            
+
             const identitasHtml = `
                 <h6><i class="fas fa-id-card me-2"></i>Identitas Kegiatan</h6>
                 <div class="review-row"><span class="review-label">Nama Kegiatan</span><span class="review-value">${escapeHtml(getVal('f_nama_kegiatan'))}</span></div>
@@ -2127,10 +2283,10 @@
                 <div class="review-row"><span class="review-label">Jenis Kegiatan</span><span class="review-value">${escapeHtml(getVal('f_jenis'))}</span></div>
                 <div class="review-row"><span class="review-label">Tahun</span><span class="review-value">${escapeHtml(getVal('f_tahun'))}</span></div>
             `;
-            
+
             const tanggal = getVal('f_tanggal');
             const formattedDate = tanggal ? new Date(tanggal).toLocaleDateString('id-ID') : '-';
-            
+
             const pelaksanaanHtml = `
                 <h6><i class="fas fa-calendar me-2"></i>Waktu & Tempat</h6>
                 <div class="review-row"><span class="review-label">Tanggal</span><span class="review-value">${formattedDate}</span></div>
@@ -2138,7 +2294,7 @@
                 <div class="review-row"><span class="review-label">Lokasi</span><span class="review-value">${escapeHtml(getVal('f_lokasi'))}</span></div>
                 <div class="review-row"><span class="review-label">Estimasi Peserta</span><span class="review-value">${getVal('f_peserta')} orang</span></div>
             `;
-            
+
             const total = document.getElementById('budget-total')?.textContent || 'Rp 0';
             const anggaranHtml = `
                 <h6><i class="fas fa-coins me-2"></i>Anggaran</h6>
@@ -2146,11 +2302,11 @@
                 <div class="review-row"><span class="review-label">Sumber Dana</span><span class="review-value">${escapeHtml(getVal('f_sumber_dana'))}</span></div>
                 <div class="review-row"><span class="review-label">Dana Diajukan</span><span class="review-value">Rp ${escapeHtml(getVal('f_dana_ajukan')) || '0'}</span></div>
             `;
-            
+
             const reviewIdentitas = document.getElementById('review-identitas');
             const reviewPelaksanaan = document.getElementById('review-pelaksanaan');
             const reviewAnggaran = document.getElementById('review-anggaran');
-            
+
             if (reviewIdentitas) reviewIdentitas.innerHTML = identitasHtml;
             if (reviewPelaksanaan) reviewPelaksanaan.innerHTML = pelaksanaanHtml;
             if (reviewAnggaran) reviewAnggaran.innerHTML = anggaranHtml;
@@ -2184,9 +2340,10 @@
 
         function resetForm() {
             const ids = ['f_ormawa', 'f_tahun', 'f_tema', 'f_jenis', 'f_nama_kegiatan', 'f_balai',
-                         'f_latar_belakang', 'f_tujuan', 'f_sasaran', 'f_tanggal', 'f_waktu_mulai',
-                         'f_waktu_selesai', 'f_lokasi', 'f_peserta', 'f_panitia', 'f_rundown',
-                         'f_sumber_dana', 'f_dana_ajukan'];
+                'f_latar_belakang', 'f_tujuan', 'f_sasaran', 'f_tanggal', 'f_waktu_mulai',
+                'f_waktu_selesai', 'f_lokasi', 'f_peserta', 'f_panitia', 'f_rundown',
+                'f_sumber_dana', 'f_dana_ajukan'
+            ];
             ids.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.value = '';
@@ -2255,48 +2412,43 @@
 
         // ==================== SUBMIT & SAVE ====================
         function collectFormData() {
-            const rabItems = [];
-            document.querySelectorAll('#budget-rows tr').forEach((row, idx) => {
-                const uraian = row.querySelector('td:nth-child(2) input')?.value;
-                if (!uraian) return;
-                rabItems.push({
-                    urutan: idx + 1,
-                    uraian: uraian,
-                    volume: row.querySelector('.budget-vol')?.value || '1',
-                    satuan: row.querySelector('td:nth-child(4) input')?.value || 'Unit',
-                    harga_satuan: (row.querySelector('.budget-harga')?.value || '0').replace(/\./g, ''),
-                    keterangan: ''
-                });
+            let rabItems = [];
+            const rows = document.querySelectorAll('#budget-rows tr');
+            rows.forEach((row) => {
+                const uraian = row.querySelector('td:nth-child(2) input')?.value || '';
+                if (uraian.trim() !== '') {
+                    rabItems.push({
+                        uraian: uraian,
+                        volume: row.querySelector('.budget-vol')?.value || '1',
+                        satuan: row.querySelector('td:nth-child(4) input')?.value || 'Unit',
+                        harga_satuan: (row.querySelector('.budget-harga')?.value || '0').replace(/\./g, ''),
+                        keterangan: ''
+                    });
+                }
             });
 
+            // Menyesuaikan key objek JavaScript agar sesuai dengan fungsi sanitize() milik Proposal_model.php
             return {
                 proposal_id: editingId,
-                tipe_proposal: currentProposalType === 'ormawa' ? 'himpunan' : 'bemdpm',
+                tipe_proposal: currentProposalType, // Cocok dengan $raw['tipe_proposal']
                 nama_kegiatan: document.getElementById('f_nama_kegiatan')?.value || '',
                 nama_ormawa: document.getElementById('f_ormawa')?.value || '',
-                tahun_kegiatan: document.getElementById('f_tahun')?.value || '',
-                tema_kegiatan: document.getElementById('f_tema')?.value || '',
-                subtema_kegiatan: '',
-                jenis_kegiatan: document.getElementById('f_jenis')?.value || '',
-                balai_divisi: document.getElementById('f_balai')?.value || '',
-                rekap_proposal: '',
+                tahun_kegiatan: document.getElementById('f_tahun')?.value || '', // Cocok dengan $raw['tahun_kegiatan']
+                tema_kegiatan: document.getElementById('f_tema')?.value || '', // Cocok dengan $raw['tema_kegiatan']
+                jenis_kegiatan: document.getElementById('f_jenis')?.value || '', // Cocok dengan $raw['jenis_kegiatan']
+                balai_divisi: document.getElementById('f_balai')?.value || '', // Cocok dengan $raw['balai_divisi']
                 latar_belakang: document.getElementById('f_latar_belakang')?.value || '',
-                tujuan_manfaat: document.getElementById('f_tujuan')?.value || '',
-                nama_tema_kegiatan: document.getElementById('f_tema')?.value || '',
-                bentuk_kegiatan: document.getElementById('f_jenis')?.value || '',
+                tujuan_manfaat: document.getElementById('f_tujuan')?.value || '', // Cocok dengan $raw['tujuan_manfaat']
+                sasaran_kegiatan: document.getElementById('f_sasaran')?.value || '', // Cocok dengan $raw['sasaran_kegiatan']
                 peserta: document.getElementById('f_peserta')?.value || '',
-                penyelenggara: document.getElementById('f_ormawa')?.value || '',
-                tanggal_kegiatan: document.getElementById('f_tanggal')?.value || '',
-                waktu_mulai: document.getElementById('f_waktu_mulai')?.value || '',
-                waktu_selesai: document.getElementById('f_waktu_selesai')?.value || '',
-                lokasi_kegiatan: document.getElementById('f_lokasi')?.value || '',
-                jadwal_detail: document.getElementById('f_rundown')?.value || '',
+                tanggal_kegiatan: document.getElementById('f_tanggal')?.value || null, // Cocok dengan $raw['tanggal_kegiatan']
+                waktu_mulai: document.getElementById('f_waktu_mulai')?.value || null,
+                waktu_selesai: document.getElementById('f_waktu_selesai')?.value || null,
+                lokasi_kegiatan: document.getElementById('f_lokasi')?.value || '', // Cocok dengan $raw['lokasi_kegiatan']
                 susunan_acara: document.getElementById('f_rundown')?.value || '',
                 susunan_panitia: document.getElementById('f_panitia')?.value || '',
-                penutup: '',
-                sasaran_kegiatan: document.getElementById('f_sasaran')?.value || '',
                 sumber_dana: document.getElementById('f_sumber_dana')?.value || '',
-                dana_diajukan: (document.getElementById('f_dana_ajukan')?.value || '0').replace(/\./g, ''),
+                dana_diajukan: (document.getElementById('f_dana_ajukan')?.value || '0').replace(/\./g, ''), // Cocok dengan $raw['dana_diajukan']
                 rab_items: rabItems
             };
         }
@@ -2307,112 +2459,114 @@
                 showToast('Nama kegiatan wajib diisi sebelum menyimpan draft', 'error');
                 return;
             }
-            
+
             showLoading(true);
-            
+
             fetch(BASE_URL + 'proposal/simpan_draft', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(result => {
-                showLoading(false);
-                if (result.status === 'success') {
-                    editingId = result.proposal_id;
-                    showToast(result.message, 'success');
-                    loadProposalsFromServer();
-                } else {
-                    showToast(result.message || 'Gagal menyimpan draft', 'error');
-                }
-            })
-            .catch(error => {
-                showLoading(false);
-                showToast('Terjadi kesalahan koneksi', 'error');
-            });
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(result => {
+                    showLoading(false);
+                    if (result.status === 'success') {
+                        editingId = result.proposal_id;
+                        showToast(result.message, 'success');
+                        loadProposalsFromServer();
+                    } else {
+                        showToast(result.message || 'Gagal menyimpan draft', 'error');
+                    }
+                })
+                .catch(error => {
+                    showLoading(false);
+                    showToast('Terjadi kesalahan koneksi', 'error');
+                });
         }
 
         function submitProposal() {
             if (!validateStep(4)) return;
-            
+
             const data = collectFormData();
             if (!data.nama_kegiatan) {
                 showToast('Data tidak lengkap', 'error');
                 return;
             }
-            
+
             showLoading(true);
-            
+
             fetch(BASE_URL + 'proposal/submit', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(result => {
-                showLoading(false);
-                if (result.status === 'success') {
-                    showToast(result.message, 'success');
-                    setTimeout(() => {
-                        backToList();
-                        loadProposalsFromServer();
-                    }, 1500);
-                } else {
-                    showToast(result.message || 'Gagal submit proposal', 'error');
-                }
-            })
-            .catch(error => {
-                showLoading(false);
-                showToast('Terjadi kesalahan koneksi', 'error');
-            });
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(result => {
+                    showLoading(false);
+                    if (result.status === 'success') {
+                        showToast(result.message, 'success');
+                        setTimeout(() => {
+                            backToList();
+                            loadProposalsFromServer();
+                        }, 1500);
+                    } else {
+                        showToast(result.message || 'Gagal submit proposal', 'error');
+                    }
+                })
+                .catch(error => {
+                    showLoading(false);
+                    showToast('Terjadi kesalahan koneksi', 'error');
+                });
         }
 
         // ==================== LOAD DATA ====================
         function loadProposalsFromServer() {
             showLoading(true);
-            
+
             fetch(BASE_URL + 'proposal/get_data_json?tipe=' + currentProposalType, {
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            })
-            .then(response => response.json())
-            .then(result => {
-                showLoading(false);
-                if (result.status === 'success') {
-                    proposals = (result.data || []).map(p => ({
-                        id: p.id,
-                        nama_kegiatan: p.nama_kegiatan,
-                        ormawa: p.nama_ormawa,
-                        tanggal: p.tanggal_kegiatan,
-                        waktu_mulai: p.waktu_mulai,
-                        waktu_selesai: p.waktu_selesai,
-                        lokasi: p.lokasi_kegiatan,
-                        jenis: p.jenis_kegiatan,
-                        peserta: p.peserta,
-                        latar_belakang: p.latar_belakang,
-                        tujuan: p.tujuan_manfaat,
-                        sasaran: p.sasaran_kegiatan,
-                        total_rab: p.total_rab,
-                        sumber_dana: p.sumber_dana,
-                        dana_diajukan: p.dana_diajukan,
-                        catatan_admin: p.catatan_admin,
-                        status: p.status || 'draft',
-                        type: p.tipe_proposal === 'himpunan' ? 'ormawa' : 'kompetisi'
-                    }));
-                    renderProposalList();
-                } else {
-                    showToast(result.message || 'Gagal memuat data', 'error');
-                }
-            })
-            .catch(error => {
-                showLoading(false);
-                showToast('Terjadi kesalahan koneksi', 'error');
-            });
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(result => {
+                    showLoading(false);
+                    if (result.status === 'success') {
+                        proposals = (result.data || []).map(p => ({
+                            id: p.id,
+                            nama_kegiatan: p.nama_kegiatan,
+                            ormawa: p.nama_ormawa,
+                            tanggal: p.tanggal_kegiatan,
+                            waktu_mulai: p.waktu_mulai,
+                            waktu_selesai: p.waktu_selesai,
+                            lokasi: p.lokasi_kegiatan,
+                            jenis: p.jenis_kegiatan,
+                            peserta: p.peserta,
+                            latar_belakang: p.latar_belakang,
+                            tujuan: p.tujuan_manfaat,
+                            sasaran: p.sasaran_kegiatan,
+                            total_rab: p.total_rab,
+                            sumber_dana: p.sumber_dana,
+                            dana_diajukan: p.dana_diajukan,
+                            catatan_admin: p.catatan_admin,
+                            status: p.status || 'draft',
+                            type: p.tipe_proposal === 'himpunan' ? 'ormawa' : 'kompetisi'
+                        }));
+                        renderProposalList();
+                    } else {
+                        showToast(result.message || 'Gagal memuat data', 'error');
+                    }
+                })
+                .catch(error => {
+                    showLoading(false);
+                    showToast('Terjadi kesalahan koneksi', 'error');
+                });
         }
 
         // ==================== PDF FUNCTIONS ====================
@@ -2427,20 +2581,35 @@
 
             const status = (p.status || 'draft').toLowerCase();
             const statusMap = {
-                'draft': { cls: 'status-draft', label: 'Draft' },
-                'submitted': { cls: 'status-review', label: 'Diajukan' },
-                'disetujui': { cls: 'status-approved', label: 'Disetujui' },
-                'ditolak': { cls: 'status-rejected', label: 'Ditolak' }
+                'draft': {
+                    cls: 'status-draft',
+                    label: 'Draft'
+                },
+                'submitted': {
+                    cls: 'status-review',
+                    label: 'Diajukan'
+                },
+                'disetujui': {
+                    cls: 'status-approved',
+                    label: 'Disetujui'
+                },
+                'ditolak': {
+                    cls: 'status-rejected',
+                    label: 'Ditolak'
+                }
             };
-            const st = statusMap[status] || { cls: 'status-draft', label: status };
+            const st = statusMap[status] || {
+                cls: 'status-draft',
+                label: status
+            };
 
-            const catatanBlock = (status === 'ditolak' && p.catatan_admin)
-                ? `<div class="detail-catatan-rejection"><i class="fas fa-exclamation-circle me-2"></i><strong>Catatan Admin:</strong> ${escapeHtml(p.catatan_admin)}</div>`
-                : '';
+            const catatanBlock = (status === 'ditolak' && p.catatan_admin) ?
+                `<div class="detail-catatan-rejection"><i class="fas fa-exclamation-circle me-2"></i><strong>Catatan Admin:</strong> ${escapeHtml(p.catatan_admin)}</div>` :
+                '';
 
-            const pdfInfo = status === 'disetujui'
-                ? `<div class="detail-pdf-available"><i class="fas fa-check-circle me-2"></i>PDF proposal tersedia.</div>`
-                : `<div class="detail-pdf-pending"><i class="fas fa-clock me-2"></i>PDF akan tersedia setelah proposal disetujui.</div>`;
+            const pdfInfo = status === 'disetujui' ?
+                `<div class="detail-pdf-available"><i class="fas fa-check-circle me-2"></i>PDF proposal tersedia.</div>` :
+                `<div class="detail-pdf-pending"><i class="fas fa-clock me-2"></i>PDF akan tersedia setelah proposal disetujui.</div>`;
 
             const modalBody = document.getElementById('detail-modal-body');
             if (modalBody) {
@@ -2516,7 +2685,36 @@
         document.addEventListener('DOMContentLoaded', function() {
             addBudgetRow();
             loadProposalsFromServer();
+
+            // Handle query params: ?action=create, ?action=edit&id=N, ?action=detail&id=N
+            const params = new URLSearchParams(window.location.search);
+            const action = params.get('action');
+            if (action === 'create') {
+                setTimeout(goToCreate, 500);
+            } else if (action === 'edit') {
+                const eid = params.get('id');
+                if (eid) {
+                    // Tunggu proposals termuat
+                    const check = setInterval(function() {
+                        if (proposals.length > 0) {
+                            clearInterval(check);
+                            editProposal(eid);
+                        }
+                    }, 200);
+                }
+            } else if (action === 'detail') {
+                const did = params.get('id');
+                if (did) {
+                    const check = setInterval(function() {
+                        if (proposals.length > 0) {
+                            clearInterval(check);
+                            openDetailModal(did);
+                        }
+                    }, 200);
+                }
+            }
         });
     </script>
 </body>
+
 </html>

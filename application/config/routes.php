@@ -73,7 +73,6 @@ $route['proposal/get_data_json']        = 'Proposal/get_data_json';
 
 $route['proposal/setujui/(:num)']       = 'Proposal/setujui/$1';
 $route['proposal/tolak/(:num)']         = 'Proposal/tolak/$1';
-$route['proposal/pdf/(:num)']          = 'Proposal/pdf/$1';
 $route['proposal/download_pdf/(:num)'] = 'Proposal/download_pdf/$1';
 $route['admin']                       = 'admin/proposal';
 $route['admin/dashboard']             = 'admin/dashboard';

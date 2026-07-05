@@ -95,19 +95,7 @@ class Admin extends CI_Controller {
     public function detail($id) {
         $proposal = $this->Proposal_model->get_by_id($id);
         if (!$proposal) show_404();
-
-        $data = [
-            'title'     => 'Detail Proposal – ' . $proposal->nama_kegiatan,
-            'proposal'  => $proposal,
-            'rab'       => $this->Proposal_model->get_rab($id),
-            'log'       => $this->Proposal_model->get_log($id),
-            'revisi'    => $this->Proposal_model->get_revisi($id),
-            'nama_user' => $this->_nama(),
-            'role'      => $this->_role(),
-            'is_admin'  => true,
-        ];
-
-        $this->load->view('admin/detail_proposal', $data);
+        redirect('admin/proposal?action=detail&id=' . $id);
     }
 
     public function get_proposals_json() {
