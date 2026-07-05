@@ -151,6 +151,80 @@ class Login extends CI_Controller {
         redirect('login');
     }
 
+    /* ─── Login dengan Microsoft (SSO) ─── */
+    public function microsoft() {
+        header('Content-Type: application/json');
+
+        // Pastikan hanya request POST/AJAX
+        if ($this->input->method() !== 'post') {
+            echo json_encode(['status' => 'error', 'message' => 'Method not allowed.']);
+            exit;
+        }
+
+        $email = trim($this->input->post('email', TRUE));
+        $password = $this->input->post('password');
+
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            echo json_encode(['status' => 'error', 'message' => 'Format email Microsoft tidak valid.']);
+            exit;
+        }
+
+        if (empty($password)) {
+            echo json_encode(['status' => 'error', 'message' => 'Password tidak boleh kosong.']);
+            exit;
+        }
+
+        // Cari di database tabel users berdasarkan email
+        $this->db->where('email', $email);
+        $this->db->where('status', 'aktif');
+        $this->db->limit(1);
+        $user = $this->db->get('users')->row();
+
+        if ($user) {
+            // Verifikasi password (menggunakan method yang sama dengan Login_model)
+            $password_correct = false;
+            if (password_verify($password, $user->password)) {
+                $password_correct = true;
+            } elseif ($user->password === md5($password)) {
+                $password_correct = true;
+            }
+
+            if ($password_correct) {
+                $session_data = [
+                    'user_id'    => $user->id,
+                    'username'   => $user->username ?? $user->nim,
+                    'nama'       => $user->nama,
+                    'nim'        => $user->nim     ?? null,
+                    'nidn'       => $user->nidn    ?? null,
+                    'role'       => $user->role,
+                    'prodi'      => $user->program_studi ?? null,
+                    'foto'       => $user->foto    ?? null,
+                    'logged_in'  => TRUE,
+                    'login_time' => time(), // Simpan waktu login
+                ];
+                $this->session->set_userdata($session_data);
+
+                echo json_encode([
+                    'status'   => 'success',
+                    'redirect' => base_url($this->_redirect_after_login($user->role))
+                ]);
+                exit;
+            } else {
+                echo json_encode([
+                    'status'  => 'error',
+                    'message' => 'Password yang Anda masukkan salah.'
+                ]);
+                exit;
+            }
+        } else {
+            echo json_encode([
+                'status'  => 'error',
+                'message' => 'Email Microsoft tidak terdaftar dalam sistem.'
+            ]);
+            exit;
+        }
+    }
+
     /* ─── Helper Redirect ─── */
     private function _redirect_after_login($role = null) {
         $role = $role ?? $this->session->userdata('role');

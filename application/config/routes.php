@@ -58,6 +58,7 @@ $route['login/proses']                  = 'Login/proses';
 $route['login/register']                = 'Login/register';
 $route['login/proses_register']         = 'Login/proses_register';
 $route['logout']                        = 'Login/logout';
+$route['login/microsoft']                 = 'Login/microsoft';
 
 $route['proposal']                      = 'Proposal/index';
 $route['proposal/buat']                 = 'Proposal/buat';
