@@ -237,7 +237,17 @@ $logo_b64 = _b64(FCPATH.'assets/nav-logo.png');
 $logo_ormawa_b64 = '';
 if (!empty($p->nama_ormawa)) {
     $ci =& get_instance();
-    $org = $ci->db->select('logo')->from('organisasi')->like('nama', $p->nama_ormawa)->get()->row();
+    $orm_query = trim($p->nama_ormawa);
+    $org = $ci->db->select('logo')->from('organisasi')->like('nama', $orm_query)->get()->row();
+    if (!$org) {
+        $words = explode(' ', $orm_query);
+        foreach ($words as $w) {
+            if (strlen($w) > 2 && !in_array(strtolower($w), ['ukm', 'hima', 'fik'])) {
+                $org = $ci->db->select('logo')->from('organisasi')->like('nama', $w)->get()->row();
+                if ($org && !empty($org->logo)) break;
+            }
+        }
+    }
     if ($org && !empty($org->logo)) {
         $logo_ormawa_path = FCPATH . ltrim($org->logo, '/');
         $logo_ormawa_b64 = _b64($logo_ormawa_path);
