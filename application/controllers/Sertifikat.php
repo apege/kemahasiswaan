@@ -547,7 +547,13 @@ public function download_export($id)
 
         $this->db->where('status', 'approved');
         if ($role === 'mahasiswa') {
+            $nim = $this->session->userdata('nim');
+            $this->db->group_start();
             $this->db->where('mahasiswa_id', $user_id);
+            if ($nim) {
+                $this->db->or_where('nim', $nim);
+            }
+            $this->db->group_end();
         }
         $this->db->order_by('approved_at', 'DESC');
         $data['sertifikat_list'] = $this->db->get('pengajuan_sertifikat')->result_array();
@@ -688,7 +694,11 @@ public function download_export($id)
     public function import_excel()
     {
         header('Content-Type: application/json');
-        $this->_check_admin_ajax();
+        
+        if (!$this->session->userdata('logged_in')) {
+            echo json_encode(['status' => 'error', 'message' => 'Unauthorized']);
+            exit;
+        }
 
         $this->form_validation->set_rules('nama_pic', 'Nama PIC', 'required|trim');
         $this->form_validation->set_rules('judul_kegiatan', 'Judul Kegiatan', 'required|trim');
@@ -701,13 +711,17 @@ public function download_export($id)
             return;
         }
 
+        $role = $this->session->userdata('role');
+        $is_admin = in_array($role, ['admin', 'kemahasiswaan']);
+
         $nama_pic = $this->input->post('nama_pic', TRUE);
         $judul_kegiatan = $this->input->post('judul_kegiatan', TRUE);
         $deskripsi_kegiatan = $this->input->post('deskripsi_kegiatan', TRUE);
         $tanggal_kegiatan = $this->input->post('tanggal_kegiatan');
         $lokasi_kegiatan = $this->input->post('lokasi_kegiatan', TRUE);
-        $import_status = $this->input->post('import_status', TRUE) ?: 'approved';
-        $nomor_sertifikat_start = $this->input->post('nomor_sertifikat_start', TRUE);
+        
+        $import_status = $is_admin ? ($this->input->post('import_status', TRUE) ?: 'approved') : 'submitted';
+        $nomor_sertifikat_start = $is_admin ? $this->input->post('nomor_sertifikat_start', TRUE) : null;
         $data_penerima = json_decode($this->input->post('data_penerima'), true);
 
         if (empty($data_penerima)) {
@@ -778,9 +792,9 @@ public function download_export($id)
                 $qr_code = base_url('sertifikat/verifikasi/') . $nomor_sertifikat;
             }
 
-            // Simpan ke pengajuan_sertifikat
+            $current_user_id = $this->session->userdata('user_id');
             $insert_data = [
-                'mahasiswa_id'       => $mahasiswa_id,
+                'mahasiswa_id'       => ($import_status === 'submitted' && $current_user_id) ? $current_user_id : $mahasiswa_id,
                 'nim'                => $nim,
                 'nama_mahasiswa'     => $nama,
                 'prodi'              => $jabatan ?: ($jurusan ?: '-'), // Prodi di DB menyimpan Jabatan/Prodi mahasiswa
@@ -794,7 +808,7 @@ public function download_export($id)
                 'qr_code'            => $qr_code,
             ];
 
-            $kode = $this->Sertifikat_model->insert($insert_data, $mahasiswa_id);
+            $kode = $this->Sertifikat_model->insert($insert_data, $this->session->userdata('user_id'));
             if ($kode) {
                 if ($import_status === 'approved') {
                     // Update ke approved dan set tanggal approved

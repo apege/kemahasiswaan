@@ -24,8 +24,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |
 */
 // $config['base_url'] = 'https://kmhfik.forzasoftwarehouse.com/';
-// $config['base_url'] = 'http://localhost/kemahasiswaan/';
-$config['base_url'] = 'http://kemahasiswaan.test/';
+$config['base_url'] = 'http://localhost/kemahasiswaan/';
+// $config['base_url'] = 'http://kemahasiswaan.test/';
 // $config['base_url'] = 'https://192.30.136.3:5001/';
 
 /*

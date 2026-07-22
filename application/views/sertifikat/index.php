@@ -1059,9 +1059,14 @@
         </a>
 
         <!-- ===== SECTION TITLE ===== -->
-        <div class="section-title" data-aos="fade-up">
-            <h2>Pengajuan Sertifikat</h2>
-            <p class="text-muted mt-3">Ajukan sertifikat untuk kegiatan yang telah dilaksanakan dengan mudah</p>
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3" data-aos="fade-up">
+            <div>
+                <h2 style="font-weight: 800; color: #1e293b; margin: 0;">Pengajuan Sertifikat</h2>
+                <p class="text-muted mt-1 mb-0">Ajukan sertifikat untuk kegiatan yang telah dilaksanakan dengan mudah</p>
+            </div>
+            <a href="<?= base_url('sertifikat/generate') ?>" class="btn-orange" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white; padding: 0.75rem 1.5rem; border-radius: 30px; font-weight: 700; text-decoration: none; box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35); display: inline-flex; align-items: center; gap: 8px;">
+                <i class="fas fa-print"></i> Cetak Sertifikat
+            </a>
         </div>
 
 
@@ -1140,8 +1145,13 @@
         </div>
 
         <!-- Form Section - VERSI SEDERHANA TANPA UPLOAD -->
-<div class="form-section" id="form-pengajuan" data-aos="fade-up">
-    <h2><i class="fas fa-pen-alt me-3"></i>Formulir Pengajuan Sertifikat</h2>
+        <div class="form-section" id="form-pengajuan" data-aos="fade-up">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <h2 class="mb-0"><i class="fas fa-pen-alt me-3"></i>Formulir Pengajuan Sertifikat</h2>
+                <button type="button" class="btn-download-excel" data-bs-toggle="modal" data-bs-target="#modalImportExcel" style="border: none; background: #10b981; color: white; padding: 0.6rem 1.2rem; border-radius: 30px; font-weight: 600;" title="Import data penerima sertifikat dari Excel">
+                    <i class="fas fa-file-upload me-1"></i> Import Excel Batch
+                </button>
+            </div>
     
     <form id="sertifikatForm" method="post" action="<?= base_url('sertifikat/kirim') ?>">
         <!-- Hidden input for editing rejected submissions -->
@@ -1370,7 +1380,7 @@
         Swal.fire({
             icon: type === 'success' ? 'success' : 'error',
             title: type === 'success' ? 'Berhasil!' : 'Perhatian!',
-            text: message,
+            html: message,
             confirmButtonColor: '#f97316',
             timer: 3000,
             showConfirmButton: true
@@ -1640,7 +1650,272 @@
     <?php if (!empty($flash_error)): ?>
         showAlert(<?= json_encode($flash_error) ?>, 'error');
     <?php endif; ?>
+
+    // Parse Excel file client-side using SheetJS
+    function handleExcelImportDirect(input) {
+        const file = input.files[0];
+        if (!file) return;
+        
+        const feedback = document.getElementById('excelImportFeedback');
+        feedback.style.display = 'block';
+        feedback.className = 'mt-2 text-warning text-start';
+        feedback.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Membaca file Excel...';
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                
+                const rawRows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                if (rawRows.length < 2) {
+                    feedback.className = 'mt-2 text-danger text-start';
+                    feedback.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>File Excel kosong atau tidak memiliki data.';
+                    document.getElementById('hiddenDataPenerima').value = '';
+                    return;
+                }
+                
+                // Cari header kolom secara fleksibel
+                const headers = rawRows[0].map(h => h ? String(h).toUpperCase().trim() : '');
+                
+                function findHeaderIndex(possibleNames) {
+                    for (let name of possibleNames) {
+                        const idx = headers.findIndex(h => h.includes(name));
+                        if (idx !== -1) return idx;
+                    }
+                    return -1;
+                }
+
+                const idxNama = findHeaderIndex(['NAMA', 'NAME', 'PESERTA', 'PENERIMA']);
+                const idxNim = findHeaderIndex(['NIM', 'NO INDUK', 'NIK', 'ID', 'NO_INDUK', 'NOMOR INDUK']);
+                const idxJabatan = findHeaderIndex(['JABATAN', 'PERAN', 'PARTISIPASI', 'ROLE', 'SEBAGAI', 'KETERANGAN', 'PRODI', 'JURUSAN', 'PROGRAM STUDI']);
+                
+                if (idxNama === -1 || idxNim === -1) {
+                    feedback.className = 'mt-2 text-danger text-start';
+                    feedback.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>Kolom NAMA dan NIM wajib ada di baris pertama Excel.';
+                    document.getElementById('hiddenDataPenerima').value = '';
+                    return;
+                }
+                
+                const mappedData = [];
+                for (let i = 1; i < rawRows.length; i++) {
+                    const row = rawRows[i];
+                    if (!row || row.length === 0) continue;
+                    
+                    const nama = row[idxNama] ? String(row[idxNama]).trim() : '';
+                    const nim = row[idxNim] ? String(row[idxNim]).trim() : '';
+                    const jabatan = idxJabatan !== -1 && row[idxJabatan] ? String(row[idxJabatan]).trim() : '';
+                    
+                    if (nama && nim) {
+                        mappedData.push({
+                            nama: nama,
+                            nim: nim,
+                            jurusan: jabatan,
+                            jabatan: jabatan
+                        });
+                    }
+                }
+                
+                if (mappedData.length === 0) {
+                    feedback.className = 'mt-2 text-danger text-start';
+                    feedback.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>Tidak ada baris data mahasiswa yang valid.';
+                    document.getElementById('hiddenDataPenerima').value = '';
+                    return;
+                }
+                
+                document.getElementById('hiddenDataPenerima').value = JSON.stringify(mappedData);
+                feedback.className = 'mt-2 text-success text-start';
+                feedback.innerHTML = `<i class="fas fa-check-circle me-2"></i>Berhasil membaca <strong>${mappedData.length}</strong> data penerima dari Excel.`;
+            } catch (err) {
+                feedback.className = 'mt-2 text-danger text-start';
+                feedback.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>Gagal mengurai file Excel: ' + err.message;
+                document.getElementById('hiddenDataPenerima').value = '';
+            }
+        };
+        reader.onerror = function() {
+            feedback.className = 'mt-2 text-danger text-start';
+            feedback.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>Terjadi kesalahan saat membaca file.';
+            document.getElementById('hiddenDataPenerima').value = '';
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    // Submit Excel Import Form via AJAX
+    function submitImportExcel(event) {
+        event.preventDefault();
+        
+        const hiddenData = document.getElementById('hiddenDataPenerima').value;
+        if (!hiddenData) {
+            alert('Silakan pilih file Excel yang valid terlebih dahulu.');
+            return;
+        }
+        
+        const form = document.getElementById('formImportExcel');
+        const btn = document.getElementById('btnSubmitImport');
+        const originalText = btn.innerHTML;
+        
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Mengimport...';
+        btn.disabled = true;
+        
+        const formData = new FormData(form);
+        
+        fetch('<?= base_url("sertifikat/import_excel") ?>', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error('Server error ' + response.status + ': ' + text.substring(0, 300));
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'success') {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('modalImportExcel'));
+                if (modal) modal.hide();
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: data.message,
+                    confirmButtonColor: '#f97316',
+                    timer: 2500
+                });
+                
+                setTimeout(() => location.reload(), 2500);
+            } else {
+                alert('Gagal: ' + (data.message || 'Unknown error'));
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        })
+        .catch(error => {
+            alert('Terjadi kesalahan: ' + error.message);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+    }
+
+    // Attach drag & drop handlers for Excel Drop Zone
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropZone = document.getElementById('excelDropZone');
+        if (dropZone) {
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropZone.style.background = '#dcfce7';
+                    dropZone.style.borderColor = '#16a34a';
+                });
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropZone.style.background = '#f0f9ff';
+                    dropZone.style.borderColor = '#27ae60';
+                });
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if (files && files.length > 0) {
+                    const fileInput = document.getElementById('excelFileImport');
+                    fileInput.files = files;
+                    handleExcelImportDirect(fileInput);
+                }
+            });
+
+            dropZone.addEventListener('click', (e) => {
+                if (e.target.tagName !== 'BUTTON') {
+                    document.getElementById('excelFileImport').click();
+                }
+            });
+        }
+    });
 </script>
+
+<!-- Modal Import Excel (Mahasiswa) -->
+<div class="modal fade" id="modalImportExcel" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15); background: white;">
+            <div class="modal-header bg-success text-white py-3">
+                <h5 class="modal-title font-weight-bold" style="color: white; margin: 0;"><i class="fas fa-file-excel me-2 text-warning"></i>Import Batch Penerima Sertifikat dari Excel</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="background-color: white; opacity: 0.8;"></button>
+            </div>
+            <form id="formImportExcel" onsubmit="submitImportExcel(event)">
+                <div class="modal-body p-4 text-start">
+                    <div class="alert alert-info" style="border-radius: 10px; background-color: #f0fdf4; border-color: #bbf7d0; color: #15803d; font-size: 0.85rem;">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Unggah daftar nama penerima dari Excel/CSV (Kolom: <strong>NO, NAMA, NIM, JURUSAN, JABATAN</strong>).
+                        <br><em>* Pengajuan hasil import akan diajukan ke admin untuk ditinjau & disetujui.</em>
+                    </div>
+                    <div class="row g-3">
+                        <!-- File Excel -->
+                        <div class="col-12">
+                            <label class="form-label font-weight-bold">File Excel / CSV <span class="text-danger">*</span></label>
+                            <div id="excelDropZone" class="border border-2 border-dashed rounded-3 p-4 text-center cursor-pointer mb-2" style="border-style: dashed !important; border-color: #27ae60 !important; background: #f0f9ff; transition: all 0.2s; border-radius: 12px;">
+                                <i class="fas fa-file-excel fa-2x text-success mb-2"></i>
+                                <p class="mb-1 fw-bold">Pilih file Excel/CSV daftar penerima</p>
+                                <button type="button" class="btn btn-sm btn-success px-3 mt-2" onclick="document.getElementById('excelFileImport').click()" style="border-radius: 8px;">Pilih File</button>
+                                <input type="file" id="excelFileImport" accept=".xlsx, .xls, .csv" style="display: none;" onchange="handleExcelImportDirect(this)">
+                            </div>
+                            <input type="hidden" name="data_penerima" id="hiddenDataPenerima" required>
+                            <div id="excelImportFeedback" class="mt-2 fw-bold text-success" style="display: none;"></div>
+                        </div>
+
+                        <!-- Nama PIC -->
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold">Nama PIC <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="nama_pic" placeholder="Contoh: Dosen Pembimbing / Panitia" required style="border-radius: 10px; padding: 10px; border: 2px solid #e2e8f0;">
+                        </div>
+
+                        <!-- Judul Kegiatan -->
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold">Judul Kegiatan <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="judul_kegiatan" placeholder="Contoh: Lomba Nasional UI/UX 2026" required style="border-radius: 10px; padding: 10px; border: 2px solid #e2e8f0;">
+                        </div>
+
+                        <!-- Deskripsi Kegiatan -->
+                        <div class="col-12">
+                            <label class="form-label font-weight-bold">Deskripsi Kegiatan</label>
+                            <textarea class="form-control" name="deskripsi_kegiatan" rows="2" placeholder="Masukkan deskripsi singkat pencapaian..." style="border-radius: 10px; padding: 10px; border: 2px solid #e2e8f0;"></textarea>
+                        </div>
+
+                        <!-- Tanggal Kegiatan -->
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold">Tanggal Kegiatan <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" name="tanggal_kegiatan" required style="border-radius: 10px; padding: 10px; border: 2px solid #e2e8f0;">
+                        </div>
+
+                        <!-- Lokasi Kegiatan -->
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold">Lokasi Kegiatan <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="lokasi_kegiatan" placeholder="Contoh: Universitas Telkom, Bandung" required style="border-radius: 10px; padding: 10px; border: 2px solid #e2e8f0;">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 d-flex gap-2">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal" style="border-radius: 10px; font-weight: 600;">Batal</button>
+                    <button type="submit" id="btnSubmitImport" class="btn btn-success px-4" style="border-radius: 10px; font-weight: 600; background: #27ae60; border: none; padding: 0.55rem 1.5rem; color: white;">
+                        <i class="fas fa-file-import me-2"></i>Kirim Pengajuan Batch
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 </body>
 </html>

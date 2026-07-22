@@ -865,6 +865,10 @@
                     <i class="fas fa-info-circle"></i><span>Tentang Kami</span>
                 </a>
 
+                <a href="<?= base_url('admin/pedoman') ?>">
+                    <i class="fas fa-book"></i><span>Pedoman &amp; Peraturan</span>
+                </a>
+
                 <div class="menu-divider"></div>
 
                 <a href="<?= base_url('admin/forum_alumni') ?>">

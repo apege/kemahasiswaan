@@ -160,3 +160,15 @@ $route['profile/change_password'] = 'profile/change_password';
 $route['profile/change_password_ajax'] = 'profile/change_password_ajax';
 $route['profile/delete_account'] = 'profile/delete_account';
 $route['profile/get_activities'] = 'profile/get_activities';
+
+// Pedoman & Peraturan – Publik
+$route['pedoman']                       = 'pedoman/index';
+$route['pedoman/download/(:num)']       = 'pedoman/download/$1';
+
+// Pedoman & Peraturan – Admin
+$route['admin/pedoman']                 = 'admin/pedoman';
+$route['admin/pedoman_store']           = 'admin/pedoman_store';
+$route['admin/pedoman_edit/(:num)']     = 'admin/pedoman_edit/$1';
+$route['admin/pedoman_update/(:num)']   = 'admin/pedoman_update/$1';
+$route['admin/pedoman_toggle/(:num)']   = 'admin/pedoman_toggle/$1';
+$route['admin/pedoman_hapus/(:num)']    = 'admin/pedoman_hapus/$1';

@@ -1157,7 +1157,7 @@
         Swal.fire({
             icon: type === 'success' ? 'success' : 'error',
             title: type === 'success' ? 'Berhasil!' : 'Perhatian!',
-            text: message,
+            html: message,
             confirmButtonColor: '#f97316',
             timer: 3000,
             showConfirmButton: true

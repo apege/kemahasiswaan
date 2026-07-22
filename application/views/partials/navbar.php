@@ -13,6 +13,10 @@ if (isset($user_data) && is_array($user_data) && isset($user_data['logged_in']) 
     $is_logged_in = true;
     $user_nama = $user->nama;
     $user_foto = $user->foto ?? '';
+} elseif (get_instance()->session->userdata('logged_in')) {
+    $is_logged_in = true;
+    $user_nama = get_instance()->session->userdata('nama') ?? '';
+    $user_foto = get_instance()->session->userdata('foto') ?? '';
 }
 
 $nav_logo_file = 'nav-logo1.jpeg';
@@ -807,6 +811,7 @@ section, .org-bg-orange, .alumni-quote-section, .partner-section, .recognition-s
                 </div>
 
                 <a href="<?= base_url('forum_alumni') ?>" class="<?= $active_menu == 'forum_alumni' ? 'active' : '' ?>">Ikatan Alumni</a>
+                <a href="<?= base_url('pedoman') ?>" class="<?= $active_menu == 'pedoman' ? 'active' : '' ?>">Pedoman</a>
                 <a href="<?= base_url('tentangkami') ?>" class="<?= $active_menu == 'tentangkami' ? 'active' : '' ?>">Tentang Kami</a>
 
                 <?php if ($is_logged_in): ?>

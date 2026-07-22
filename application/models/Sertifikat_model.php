@@ -142,11 +142,15 @@ class Sertifikat_model extends CI_Model
     
     public function get_by_mahasiswa($mahasiswa_id)
     {
-        return $this->db
-            ->where('mahasiswa_id', $mahasiswa_id)
-            ->order_by('created_at', 'DESC')
-            ->get('pengajuan_sertifikat')
-            ->result_array();
+        $nim = get_instance()->session->userdata('nim');
+        $this->db->group_start();
+        $this->db->where('mahasiswa_id', $mahasiswa_id);
+        if ($nim) {
+            $this->db->or_where('nim', $nim);
+        }
+        $this->db->group_end();
+        $this->db->order_by('created_at', 'DESC');
+        return $this->db->get('pengajuan_sertifikat')->result_array();
     }
     
     public function get_all($status = '', $search = '')

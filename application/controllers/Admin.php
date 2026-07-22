@@ -1402,6 +1402,19 @@ class Admin extends CI_Controller {
     }
 
     public function forum_alumni() {
+        $json_path = FCPATH . 'assets/ikatan_alumni_setting.json';
+        $default_ikatan_alumni = [
+            'nama_organisasi' => 'Ikatan Alumni Fakultas Industri Kreatif',
+            'singkatan'       => 'IKA FIK Telkom University',
+            'logo'            => 'logo-fik.jpeg',
+            'nama_ketua'      => 'Ahmad Rizky Pratama, S.Des.',
+            'jabatan_ketua'   => 'Ketua Ikatan Alumni FIK',
+            'periode_ketua'   => '2024 - 2028',
+            'foto_ketua'      => '',
+            'sambutan_ketua'  => 'Wadah silaturahmi, sinergi, dan kolaborasi bagi seluruh alumni Fakultas Industri Kreatif Telkom University untuk terus berkarya, berinovasi, dan berdampak bagi masyarakat.'
+        ];
+        $ikatan_alumni = file_exists($json_path) ? array_merge($default_ikatan_alumni, json_decode(file_get_contents($json_path), true) ?: []) : $default_ikatan_alumni;
+
         $this->db->select('p.*, u.nama, u.username, u.role');
         $this->db->from('forum_alumni_posts p');
         $this->db->join('users u', 'u.id = p.user_id');
@@ -1409,13 +1422,92 @@ class Admin extends CI_Controller {
         $posts = $this->db->get()->result_array();
 
         $data = [
-            'title'     => 'Moderasi Forum Alumni',
-            'posts'     => $posts,
-            'nama_user' => $this->_nama(),
-            'role'      => $this->_role(),
+            'title'         => 'Ikatan Alumni & Moderasi Forum',
+            'posts'         => $posts,
+            'ikatan_alumni' => $ikatan_alumni,
+            'nama_user'     => $this->_nama(),
+            'role'          => $this->_role(),
         ];
 
         $this->load->view('admin/forum_alumni', $data);
+    }
+
+    public function edit_ikatan_alumni() {
+        $json_path = FCPATH . 'assets/ikatan_alumni_setting.json';
+        $default_data = [
+            'nama_organisasi' => 'Ikatan Alumni Fakultas Industri Kreatif',
+            'singkatan'       => 'IKA FIK Telkom University',
+            'logo'            => 'logo-fik.jpeg',
+            'nama_ketua'      => 'Ahmad Rizky Pratama, S.Des.',
+            'jabatan_ketua'   => 'Ketua Ikatan Alumni FIK',
+            'periode_ketua'   => '2024 - 2028',
+            'foto_ketua'      => '',
+            'sambutan_ketua'  => 'Wadah silaturahmi, sinergi, dan kolaborasi bagi seluruh alumni Fakultas Industri Kreatif Telkom University untuk terus berkarya, berinovasi, dan berdampak bagi masyarakat.',
+            'quote_ketua'     => 'Mempererat jejaring alumni FIK, menyalurkan potensi & sinergi karya kreatif untuk almamater dan Indonesia.'
+        ];
+
+        $current_data = file_exists($json_path)
+            ? array_merge($default_data, json_decode(file_get_contents($json_path), true) ?: [])
+            : $default_data;
+
+        if ($this->input->method() === 'post') {
+            $logo_file = $current_data['logo'];
+            $foto_ketua_file = $current_data['foto_ketua'];
+
+            // Upload logo
+            if (!empty($_FILES['logo']['name'])) {
+                $upload_path = FCPATH . 'uploads/alumni/';
+                if (!is_dir($upload_path)) {
+                    mkdir($upload_path, 0777, true);
+                }
+                $config = [
+                    'upload_path'   => $upload_path,
+                    'allowed_types' => 'jpg|jpeg|png|webp|svg',
+                    'file_name'     => 'logo_alumni_' . time(),
+                    'overwrite'     => TRUE,
+                    'max_size'      => 5120
+                ];
+                $this->upload->initialize($config);
+                if ($this->upload->do_upload('logo')) {
+                    $logo_file = 'uploads/alumni/' . $this->upload->data('file_name');
+                }
+            }
+
+            // Upload foto ketua
+            if (!empty($_FILES['foto_ketua']['name'])) {
+                $upload_path = FCPATH . 'uploads/alumni/';
+                if (!is_dir($upload_path)) {
+                    mkdir($upload_path, 0777, true);
+                }
+                $config_foto = [
+                    'upload_path'   => $upload_path,
+                    'allowed_types' => 'jpg|jpeg|png|webp',
+                    'file_name'     => 'ketua_alumni_' . time(),
+                    'overwrite'     => TRUE,
+                    'max_size'      => 5120
+                ];
+                $this->upload->initialize($config_foto);
+                if ($this->upload->do_upload('foto_ketua')) {
+                    $foto_ketua_file = 'uploads/alumni/' . $this->upload->data('file_name');
+                }
+            }
+
+            $update_data = [
+                'nama_organisasi' => $this->input->post('nama_organisasi', TRUE) ?: $current_data['nama_organisasi'],
+                'singkatan'       => $this->input->post('singkatan', TRUE) ?: $current_data['singkatan'],
+                'logo'            => $logo_file,
+                'nama_ketua'      => $this->input->post('nama_ketua', TRUE) ?: $current_data['nama_ketua'],
+                'jabatan_ketua'   => $this->input->post('jabatan_ketua', TRUE) ?: $current_data['jabatan_ketua'],
+                'periode_ketua'   => $this->input->post('periode_ketua', TRUE) ?: $current_data['periode_ketua'],
+                'foto_ketua'      => $foto_ketua_file,
+                'sambutan_ketua'  => $this->input->post('sambutan_ketua', TRUE) ?: $current_data['sambutan_ketua'],
+                'quote_ketua'     => $this->input->post('quote_ketua', TRUE) ?: $current_data['quote_ketua'],
+            ];
+
+            file_put_contents($json_path, json_encode($update_data, JSON_PRETTY_PRINT));
+            $this->session->set_flashdata('success', 'Informasi & Profil Ikatan Alumni berhasil diperbarui!');
+            redirect('admin/forum_alumni');
+        }
     }
 
     public function approve_forum_post($id) {
@@ -1503,6 +1595,157 @@ class Admin extends CI_Controller {
             $this->session->set_flashdata('error', 'Postingan tidak ditemukan.');
         }
         redirect('admin/forum_alumni');
+    }
+
+    // =========================================================================
+    // PEDOMAN & PERATURAN
+    // =========================================================================
+
+    private function _data_pedoman_base() {
+        $this->load->model('Pedoman_model');
+        return [
+            'nama_user'   => $this->_nama(),
+            'role'        => $this->_role(),
+            'pedoman_list'=> $this->Pedoman_model->get_all(),
+            'total'       => $this->Pedoman_model->count_all(),
+            'total_aktif' => $this->Pedoman_model->count_aktif(),
+        ];
+    }
+
+    /** Halaman utama manajemen pedoman */
+    public function pedoman() {
+        $data = array_merge($this->_data_pedoman_base(), [
+            'title' => 'Manajemen Pedoman & Peraturan',
+        ]);
+        $this->load->view('admin/pedoman', $data);
+    }
+
+    /** Simpan peraturan baru */
+    public function pedoman_store() {
+        $this->load->model('Pedoman_model');
+        $judul = trim($this->input->post('judul'));
+        if (empty($judul)) {
+            $this->session->set_flashdata('error', 'Judul peraturan wajib diisi.');
+            redirect('admin/pedoman');
+        }
+
+        $isi = $this->input->post('isi');
+        // Allow HTML (Summernote output)
+        $save = [
+            'judul'     => $judul,
+            'deskripsi' => trim($this->input->post('deskripsi')),
+            'isi'       => $isi,
+            'urutan'    => (int)$this->input->post('urutan'),
+            'aktif'     => $this->input->post('aktif') ? (int)$this->input->post('aktif') : 1,
+        ];
+
+        // Handle PDF upload
+        if (!empty($_FILES['file_pdf']['name'])) {
+            $res = $this->_upload_pedoman_pdf();
+            if ($res['status'] === 'error') {
+                $this->session->set_flashdata('error', $res['message']);
+                redirect('admin/pedoman');
+            }
+            $save['file_pdf'] = $res['path'];
+        }
+
+        $this->Pedoman_model->insert($save);
+        $this->session->set_flashdata('success', 'Peraturan berhasil ditambahkan.');
+        redirect('admin/pedoman');
+    }
+
+    /** Tampilkan form edit peraturan */
+    public function pedoman_edit($id) {
+        $this->load->model('Pedoman_model');
+        $item = $this->Pedoman_model->get_by_id($id);
+        if (!$item) {
+            $this->session->set_flashdata('error', 'Peraturan tidak ditemukan.');
+            redirect('admin/pedoman');
+        }
+        $data = array_merge($this->_data_pedoman_base(), [
+            'title'     => 'Edit Peraturan',
+            'edit_item' => $item,
+        ]);
+        $this->load->view('admin/pedoman', $data);
+    }
+
+    /** Proses update peraturan */
+    public function pedoman_update($id) {
+        $this->load->model('Pedoman_model');
+        $item = $this->Pedoman_model->get_by_id($id);
+        if (!$item) {
+            $this->session->set_flashdata('error', 'Peraturan tidak ditemukan.');
+            redirect('admin/pedoman');
+        }
+
+        $judul = trim($this->input->post('judul'));
+        if (empty($judul)) {
+            $this->session->set_flashdata('error', 'Judul peraturan wajib diisi.');
+            redirect('admin/pedoman_edit/' . $id);
+        }
+
+        $save = [
+            'judul'     => $judul,
+            'deskripsi' => trim($this->input->post('deskripsi')),
+            'isi'       => $this->input->post('isi'),
+            'urutan'    => (int)$this->input->post('urutan'),
+            'aktif'     => (int)$this->input->post('aktif'),
+        ];
+
+        if (!empty($_FILES['file_pdf']['name'])) {
+            $res = $this->_upload_pedoman_pdf();
+            if ($res['status'] === 'error') {
+                $this->session->set_flashdata('error', $res['message']);
+                redirect('admin/pedoman_edit/' . $id);
+            }
+            // Hapus file lama
+            if (!empty($item->file_pdf) && file_exists(FCPATH . $item->file_pdf)) {
+                @unlink(FCPATH . $item->file_pdf);
+            }
+            $save['file_pdf'] = $res['path'];
+        }
+
+        $this->Pedoman_model->update($id, $save);
+        $this->session->set_flashdata('success', 'Peraturan berhasil diperbarui.');
+        redirect('admin/pedoman');
+    }
+
+    /** Toggle aktif/nonaktif */
+    public function pedoman_toggle($id) {
+        $this->load->model('Pedoman_model');
+        $this->Pedoman_model->toggle_aktif($id);
+        $this->session->set_flashdata('success', 'Status peraturan berhasil diubah.');
+        redirect('admin/pedoman');
+    }
+
+    /** Hapus peraturan */
+    public function pedoman_hapus($id) {
+        $this->load->model('Pedoman_model');
+        $result = $this->Pedoman_model->delete($id);
+        $this->session->set_flashdata(
+            $result ? 'success' : 'error',
+            $result ? 'Peraturan berhasil dihapus.' : 'Gagal menghapus peraturan.'
+        );
+        redirect('admin/pedoman');
+    }
+
+    /** Helper: upload file PDF pedoman */
+    private function _upload_pedoman_pdf() {
+        $upload_path = FCPATH . 'uploads/pedoman/';
+        if (!is_dir($upload_path)) {
+            mkdir($upload_path, 0755, true);
+        }
+        $this->upload->initialize([
+            'upload_path'   => $upload_path,
+            'allowed_types' => 'pdf',
+            'max_size'      => 10240, // 10 MB
+            'encrypt_name'  => true,
+        ]);
+        if (!$this->upload->do_upload('file_pdf')) {
+            return ['status' => 'error', 'message' => $this->upload->display_errors('', '')];
+        }
+        $file = $this->upload->data();
+        return ['status' => 'success', 'path' => 'uploads/pedoman/' . $file['file_name']];
     }
 
 }

@@ -13,8 +13,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-    <style>a
+    <style>
         body {
             font-family: 'Montserrat', sans-serif;
             background-color: #f8f9fa;
@@ -357,11 +358,13 @@
 
         .template-check {
             width: 26px; height: 26px;
+            min-width: 26px; min-height: 26px;
             border-radius: 50%;
             background: #e9ecef;
             border: 2px solid #dee2e6;
             display: flex; align-items: center; justify-content: center;
             color: white; font-size: 0.75rem;
+            flex-shrink: 0;
             transition: all 0.25s;
         }
 
@@ -427,12 +430,31 @@
         #cert-text-overlay {
             position: absolute;
             inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 0 8%;
             pointer-events: none;
+        }
+
+        .draggable-cert-element {
+            position: absolute !important;
+            pointer-events: auto !important;
+            cursor: move !important;
+            user-select: none;
+            transition: outline 0.15s ease, box-shadow 0.15s ease;
+            outline: 1.5px dashed transparent;
+            outline-offset: 3px;
+            border-radius: 4px;
+        }
+
+        .draggable-cert-element:hover {
+            outline-color: rgba(249, 115, 22, 0.8) !important;
+            background: rgba(249, 115, 22, 0.05) !important;
+        }
+
+        .draggable-cert-element.is-dragging {
+            outline-color: #f97316 !important;
+            outline-style: solid !important;
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.35);
+            background: rgba(249, 115, 22, 0.12) !important;
+            z-index: 9999 !important;
         }
 
         .cert-intro  { font-size: 1.8cqw; color: #374151; margin-bottom: 6px; font-family: 'Montserrat', sans-serif; }
@@ -659,17 +681,149 @@
                 font-size: 0.7rem !important;
             }
         }
+
+        /* ── Override styles for Mahasiswa ── */
+        <?php if ($this->session->userdata('role') === 'mahasiswa'): ?>
+        .admin-main {
+            margin-left: 0 !important;
+            padding: 2rem 0 !important;
+            max-width: 100% !important;
+        }
+        .hero-sertifikat {
+            background: linear-gradient(135deg, #f97316 0%, #fdba74 100%);
+            padding: 200px 0 100px;
+            position: relative;
+            overflow: hidden;
+            clip-path: polygon(0 0, 100% 0, 100% 88%, 0 100%);
+            margin-top: -54px;
+            margin-bottom: 30px;
+        }
+        .hero-sertifikat h1 {
+            font-size: clamp(2.2rem, 4vw, 3.5rem);
+            font-weight: 800;
+            color: white;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            font-family: 'Playfair Display', serif;
+        }
+        .hero-sertifikat p {
+            color: rgba(255,255,255,0.95);
+            font-size: 1.1rem;
+            text-align: center;
+            max-width: 700px;
+            margin: 16px auto 0;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-sertifikat .floating-elements {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .hero-sertifikat .floating-elements .element {
+            position: absolute;
+            opacity: 0.15;
+            color: white;
+            animation: float 6s ease-in-out infinite;
+        }
+        .hero-sertifikat .floating-elements .element:nth-child(1) { top: 20%; left: 10%; font-size: 2rem; }
+        .hero-sertifikat .floating-elements .element:nth-child(2) { top: 60%; left: 15%; font-size: 1.5rem; }
+        .hero-sertifikat .floating-elements .element:nth-child(3) { top: 30%; right: 12%; font-size: 2.2rem; }
+        .hero-sertifikat .floating-elements .element:nth-child(4) { top: 70%; right: 20%; font-size: 1.8rem; }
+        .hero-sertifikat .wave-bottom {
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            line-height: 0;
+        }
+        .container-custom {
+            width: min(100% - 3rem, 1280px);
+            margin-inline: auto;
+        }
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: transparent;
+            color: #f97316;
+            padding: 10px 24px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border: 2px solid #f97316;
+        }
+        .back-button:hover {
+            background: #f97316;
+            color: white;
+            transform: translateX(-4px);
+            box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3);
+        }
+        .footer {
+            background: linear-gradient(115deg, #152b4e 0%, #0f172a 100%);
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 60px;
+        }
+        .footer a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .footer a:hover {
+            color: #f97316;
+        }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            margin-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.85rem;
+        }
+        <?php endif; ?>
     </style>
 </head>
 <body>
+<?php if ($this->session->userdata('role') === 'mahasiswa'): ?>
+    <?php $this->load->view('partials/navbar', ['active_menu' => 'layanan']); ?>
+    <!-- ========== HERO SECTION ========== -->
+    <section class="hero-sertifikat">
+        <div class="floating-elements">
+            <div class="element"><i class="fas fa-certificate"></i></div>
+            <div class="element"><i class="fas fa-file-pdf"></i></div>
+            <div class="element"><i class="fas fa-file-excel"></i></div>
+            <div class="element"><i class="fas fa-stamp"></i></div>
+        </div>
+        <div class="container-custom">
+            <h1 data-aos="fade-up">Cetak Sertifikat Kegiatan</h1>
+            <p data-aos="fade-up" data-aos-delay="100">Cetak sertifikat resmi untuk kegiatan yang telah disetujui oleh admin</p>
+        </div>
+        <div class="wave-bottom">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" style="width:100%;">
+                <path fill="#ffffff" fill-opacity="1" d="M0,64L80,74.7C160,85,320,107,480,106.7C640,107,800,85,960,80C1120,75,1280,85,1360,90.7L1440,96L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"></path>
+            </svg>
+        </div>
+    </section>
+
+    <div class="container-custom py-4">
+        <!-- Tombol Kembali -->
+        <a href="<?= base_url('sertifikat') ?>" class="back-button mb-4" data-aos="fade-right">
+            <i class="fas fa-arrow-left"></i>
+            Kembali ke Pengajuan Sertifikat
+        </a>
+<?php else: ?>
     <!-- Mobile Topbar -->
     <div class="mobile-topbar" id="mobileTopbar">
         <div class="topbar-inner">
             <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Toggle Menu">
                 <i class="fas fa-bars" id="hamburgerIcon"></i>
             </button>
-            <div
-             class="topbar-right">
+            <div class="topbar-right">
                 <span class="topbar-username">
                     <i class="fas fa-user-circle"></i>
                     <span class="name-text"><?= $this->session->userdata('nama') ?></span>
@@ -685,27 +839,7 @@
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
 <div class="admin-wrapper">
-
     <!-- Sidebar -->
-    <?php if ($this->session->userdata('role') === 'mahasiswa'): ?>
-    <div class="admin-sidebar" id="adminSidebar">
-        <div class="sidebar-header">
-            <h3>Mahasiswa FIK</h3>
-            <p>Cetak Sertifikat</p>
-        </div>
-        <div class="sidebar-menu">
-            <a href="<?= base_url('sertifikat') ?>" class="active">
-                <i class="fas fa-certificate"></i>
-                <span>Cetak Sertifikat</span>
-            </a>
-            <div class="menu-divider"></div>
-            <a href="<?= base_url('dashboard') ?>">
-                <i class="fas fa-arrow-left"></i>
-                <span>Kembali ke Dashboard</span>
-            </a>
-        </div>
-    </div>
-    <?php else: ?>
     <div class="admin-sidebar" id="adminSidebar">
         <div class="sidebar-header">
             <h3>Admin FIK</h3>
@@ -809,9 +943,10 @@
     <?php endif; ?>
 
     <!-- Main Content -->
-    <div class="admin-main">
+    <div class="admin-main <?= ($this->session->userdata('role') === 'mahasiswa') ? 'p-0' : '' ?>">
 
         <!-- Header -->
+        <?php if ($this->session->userdata('role') !== 'mahasiswa'): ?>
         <div class="admin-header">
             <h1>Generate Sertifikat PDF</h1>
             <div class="user-info">
@@ -821,6 +956,7 @@
                 </a>
             </div>
         </div>
+        <?php endif; ?>
 
         <!-- Steps Bar -->
         <div class="steps-bar">
@@ -1025,29 +1161,31 @@
                     <div id="cert-canvas-container" style="position:relative;display:inline-block;">
                         <img id="cert-template-img" src="" alt="Template">
                         <div id="cert-text-overlay">
-                            <!-- Judul CERTIFICATE di atas -->
-                            <div class="cert-title-main" style="font-size: 5cqw; font-weight: 800; color: #d35400; letter-spacing: 0.3cqw; margin-bottom: 0.3cqw; text-transform: uppercase;">Certificate</div>
+                            <!-- Judul CERTIFICATE -->
+                            <div class="cert-title-main draggable-cert-element" style="top:18%; left:50%; transform:translate(-50%,-50%); font-size: 4.8cqw; font-weight: 800; color: #d35400; letter-spacing: 0.3cqw; text-transform: uppercase;">Certificate</div>
 
-                            <!-- Nomor Sertifikat di bawah judul -->
-                            <div class="cert-nomor" id="prev-nomor" style="font-size: 1.6cqw; font-weight: 700; color: #2C3E50; letter-spacing: 0.15cqw; margin-bottom: 1.8cqw; text-transform: uppercase;">Certificate Number: 020/S-AKD05/IK-DEK/2026</div>
+                            <!-- Nomor Sertifikat -->
+                            <div class="cert-nomor draggable-cert-element" id="prev-nomor" style="top:25%; left:50%; transform:translate(-50%,-50%); font-size: 1.5cqw; font-weight: 700; color: #2C3E50; letter-spacing: 0.15cqw; text-transform: uppercase; white-space:nowrap;">Certificate Number: 020/S-AKD05/IK-DEK/2026</div>
 
-                            <!-- Kalimat pembuka / partisipasi -->
-                            <div class="cert-intro" style="font-size: 1.75cqw; font-style: italic; color: #7f8c8d; margin-bottom: 0.9cqw;">THIS CERTIFICATE IS PRESENT TO</div>
+                            <!-- Kalimat pembuka -->
+                            <div class="cert-intro draggable-cert-element" style="top:32%; left:50%; transform:translate(-50%,-50%); font-size: 1.65cqw; font-style: italic; color: #7f8c8d; white-space:nowrap;">THIS CERTIFICATE IS PRESENT TO</div>
 
-                            <!-- Nama Penerima besar dengan garis bawah -->
-                            <div class="cert-name-container" style="border-bottom: 0.3cqw solid #E67E22; padding-bottom: 0.6cqw; margin-bottom: 1.8cqw; min-width: 40cqw; text-align: center;">
-                                <div class="cert-name" id="prev-nama" style="font-size: 4cqw; font-weight: 800; color: #2C3E50; font-family: 'Montserrat', sans-serif;">TEGUH AKBAR, ST</div>
+                            <!-- Nama Penerima -->
+                            <div class="cert-name-container draggable-cert-element" style="top:42%; left:50%; transform:translate(-50%,-50%); border-bottom: 0.3cqw solid #E67E22; padding-bottom: 0.4cqw; min-width: 40cqw; text-align: center;">
+                                <div class="cert-name" id="prev-nama" style="font-size: 3.8cqw; font-weight: 800; color: #2C3E50; font-family: 'Montserrat', sans-serif;">TEGUH AKBAR, ST</div>
                             </div>
 
-                            <!-- Keterangan Partisipasi & Kegiatan -->
-                            <div class="cert-desc" id="prev-desc" style="font-size: 1.75cqw; color: #7f8c8d; margin-bottom: 0.9cqw;">For the Participation as <strong style="color: #d35400;" id="prev-role">Committee</strong> at :</div>
-                            <div class="cert-event" id="prev-judul" style="font-size: 2.6cqw; font-weight: 700; color: #2C3E50; text-transform: uppercase; margin-bottom: 0.9cqw; text-align: center;">BERWARA ADVERTISING EXHIBITION & AWARD</div>
+                            <!-- Keterangan Partisipasi -->
+                            <div class="cert-desc draggable-cert-element" id="prev-desc" style="top:53%; left:50%; transform:translate(-50%,-50%); font-size: 1.65cqw; color: #7f8c8d; white-space:nowrap;">For the Participation as <strong style="color: #d35400;" id="prev-role">Committee</strong> at :</div>
+
+                            <!-- Judul Kegiatan -->
+                            <div class="cert-event draggable-cert-element" id="prev-judul" style="top:61%; left:50%; transform:translate(-50%,-50%); font-size: 2.5cqw; font-weight: 700; color: #2C3E50; text-transform: uppercase; text-align: center; max-width: 90%;">BERWARA ADVERTISING EXHIBITION & AWARD</div>
 
                             <!-- Waktu & Tempat -->
-                            <div class="cert-date" id="prev-tanggal" style="font-size: 1.6cqw; color: #7f8c8d; text-transform: uppercase; font-weight: 600; margin-bottom: 1.2cqw;">HELD AT SCHOOL OF CREATIVE INDUSTRIES</div>
+                            <div class="cert-date draggable-cert-element" id="prev-tanggal" style="top:69%; left:50%; transform:translate(-50%,-50%); font-size: 1.55cqw; color: #7f8c8d; text-transform: uppercase; font-weight: 600; white-space:nowrap;">HELD AT SCHOOL OF CREATIVE INDUSTRIES</div>
 
-                            <!-- Tanda tangan Dean of School, di tengah, di bawah tanggal -->
-                            <div id="cert-signature-wrap">
+                            <!-- Tanda tangan -->
+                            <div id="cert-signature-wrap" class="draggable-cert-element" style="top:82%; left:50%; transform:translate(-50%,-50%);">
                                 <div class="sig-role" id="sig-role">Dean of School</div>
                                 <div class="sig-space" id="sig-space">
                                     <img id="sig-image" src="" alt="Tanda tangan" style="display:none;">
@@ -1056,8 +1194,9 @@
                                 <div class="sig-nip" id="sig-nip">NIP: 14760039</div>
                             </div>
                         </div>
-                        <!-- QR Code di pojok kiri bawah (sesuai layout gambar) -->
-                        <div id="cert-qr-wrap" <?php if ($this->session->userdata('role') !== 'mahasiswa') echo 'style="display: none !important;"'; ?>>
+
+                        <!-- QR Code -->
+                        <div id="cert-qr-wrap" class="draggable-cert-element" style="top:84%; left:10%; transform:translate(-50%,-50%);" <?php if ($this->session->userdata('role') !== 'mahasiswa') echo 'style="display: none !important;"'; ?>>
                             <canvas id="cert-qr-canvas"></canvas>
                             <span id="cert-qr-label">verify</span>
                         </div>
@@ -1083,6 +1222,12 @@
                         <span style="color:#888;font-size:.8rem;" id="qrPosY-val">82%</span>
                     </div>
                     <?php endif; ?>
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                        <label><i class="fas fa-arrows-alt me-1 text-warning"></i> Tata Letak Teks & QR Code</label>
+                        <button type="button" onclick="resetCertLayout()" class="btn btn-sm btn-outline-secondary" style="border-radius:8px; font-size:0.8rem; font-weight:600; padding:4px 12px;">
+                            <i class="fas fa-undo me-1"></i> Reset Posisi Tata Letak
+                        </button>
+                    </div>
                     <div>
                         <label>Warna Nama</label>
                         <input type="color" id="nameColor" value="#1e3a5f" oninput="adjustText()">
@@ -1091,6 +1236,8 @@
                         <label>Warna Teks Isi</label>
                         <input type="color" id="textColor" value="#374151" oninput="adjustText()">
                     </div>
+
+                    <?php if ($this->session->userdata('role') !== 'mahasiswa'): ?>
                     <div>
                         <label>Jabatan Penandatangan</label>
                         <input type="text" id="deanRole" value="Dean of School" style="border:1px solid #e0e0e0;border-radius:8px;padding:6px 10px;font-size:0.8rem;font-family:'Montserrat';width:200px;" oninput="updateSignature()">
@@ -1119,6 +1266,13 @@
                             <input type="file" id="sigImageInput" accept="image/png, image/jpeg" style="display:none;" onchange="handleSignatureImageUpload(this)">
                         </div>
                     </div>
+                    <?php else: ?>
+                    <input type="hidden" id="deanRole" value="Dean of School">
+                    <input type="hidden" id="deanName" value="Dandi Yunidar, S.Sn., M.Ds., Ph.D.">
+                    <input type="hidden" id="deanNip" value="14760039">
+                    <input type="file" id="sigImageInput" style="display:none;">
+                    <?php endif; ?>
+
                 </div>
 
                 <div class="btn-group-actions">
@@ -1137,8 +1291,51 @@
             </div>
         </div>
 
+<?php if ($this->session->userdata('role') === 'mahasiswa'): ?>
+        </div><!-- /admin-main -->
+    </div><!-- /container-custom -->
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="footer">
+        <div class="container-custom">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h4 class="mb-3" style="color: #f97316;">Fakultas Industri Kreatif</h4>
+                    <p style="opacity: 0.8; font-size: 0.9rem;">Menjadi pusat unggulan pendidikan industri kreatif yang menghasilkan lulusan berdaya saing global.</p>
+                    <div class="d-flex gap-3 mt-3">
+                        <a href="#"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in fa-lg"></i></a>
+                        <a href="#"><i class="fab fa-youtube fa-lg"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h4 class="mb-3" style="color: #f97316;">Tautan Cepat</h4>
+                    <ul class="list-unstyled" style="font-size: 0.9rem; line-height: 1.8;">
+                        <li class="mb-2"><a href="<?= base_url('dashboard') ?>">Dashboard</a></li>
+                        <li class="mb-2"><a href="<?= base_url('berita') ?>">Berita</a></li>
+                        <li class="mb-2"><a href="#">Layanan Mahasiswa</a></li>
+                        <li class="mb-2"><a href="#">Forum Alumni</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h4 class="mb-3" style="color: #f97316;">Kontak</h4>
+                    <ul class="list-unstyled" style="font-size: 0.9rem; line-height: 1.8;">
+                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> Bandung, Jawa Barat</li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i> fik@telkomuniversity.ac.id</li>
+                        <li class="mb-2"><i class="fas fa-phone me-2"></i> (022) 756 5923</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="mb-0">&copy; <?= date('Y') ?> Fakultas Industri Kreatif - Telkom University. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+<?php else: ?>
     </div><!-- /admin-main -->
 </div><!-- /admin-wrapper -->
+<?php endif; ?>
 
 <!-- Loading overlay -->
 <div id="download-loading">
@@ -1177,12 +1374,21 @@
     /* ── Pilih baris ── */
     function selectRow(tr, data) {
         tr.classList.toggle('selected');
+        const icon = tr.querySelector('.select-icon');
         
         const idx = selectedRows.findIndex(r => r.id === data.id);
         if (idx > -1) {
             selectedRows.splice(idx, 1);
+            if (icon) {
+                icon.className = 'far fa-square select-icon';
+                icon.style.color = '#cbd5e1';
+            }
         } else {
             selectedRows.push(data);
+            if (icon) {
+                icon.className = 'fas fa-check-square select-icon';
+                icon.style.color = '#27ae60';
+            }
         }
         
         selectedRow = selectedRows.length > 0 ? selectedRows[0] : null;
@@ -1415,6 +1621,19 @@
 
         renderQR();
         updateSignature();
+        
+        // Render approved signature image if present in database
+        const sigImg = document.getElementById('sig-image');
+        if (sigImg) {
+            if (d.signature_image) {
+                sigImg.src = BASE_URL + d.signature_image;
+                sigImg.style.display = 'block';
+            } else {
+                sigImg.src = '';
+                sigImg.style.display = 'none';
+            }
+        }
+        
         adjustText();
     }
 
@@ -1559,85 +1778,139 @@
         document.getElementById('qrPosY-val').textContent = y + '%';
     }
 
-    /* ── Make QR Code Draggable ── */
-    function makeQrDraggable() {
-        const qrWrap = document.getElementById('cert-qr-wrap');
+    /* ── Make All Elements Draggable ── */
+    function makeAllElementsDraggable() {
         const container = document.getElementById('cert-canvas-container');
+        if (!container) return;
+
+        const draggables = container.querySelectorAll('.draggable-cert-element');
+
+        draggables.forEach(el => {
+            let isDragging = false;
+            let startX, startY;
+            let startLeftPct, startTopPct;
+
+            el.addEventListener('mousedown', dragStart);
+            el.addEventListener('touchstart', dragStart, { passive: false });
+
+            function dragStart(e) {
+                if (e.type === 'mousedown' && e.button !== 0) return;
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                isDragging = true;
+                el.classList.add('is-dragging');
+
+                const containerRect = container.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+                startX = clientX;
+                startY = clientY;
+
+                const styleLeft = el.style.left;
+                const styleTop = el.style.top;
+
+                if (styleLeft && styleLeft.endsWith('%')) {
+                    startLeftPct = parseFloat(styleLeft);
+                } else {
+                    const elRect = el.getBoundingClientRect();
+                    const centerX = elRect.left + (elRect.width / 2) - containerRect.left;
+                    startLeftPct = (centerX / containerRect.width) * 100;
+                }
+
+                if (styleTop && styleTop.endsWith('%')) {
+                    startTopPct = parseFloat(styleTop);
+                } else {
+                    const elRect = el.getBoundingClientRect();
+                    const centerY = elRect.top + (elRect.height / 2) - containerRect.top;
+                    startTopPct = (centerY / containerRect.height) * 100;
+                }
+
+                window.addEventListener('mousemove', dragMove);
+                window.addEventListener('touchmove', dragMove, { passive: false });
+                window.addEventListener('mouseup', dragEnd);
+                window.addEventListener('touchend', dragEnd);
+            }
+
+            function dragMove(e) {
+                if (!isDragging) return;
+                e.preventDefault();
+
+                const containerRect = container.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+                const deltaX = clientX - startX;
+                const deltaY = clientY - startY;
+
+                const deltaLeftPct = (deltaX / containerRect.width) * 100;
+                const deltaTopPct = (deltaY / containerRect.height) * 100;
+
+                let newLeft = Math.max(2, Math.min(98, startLeftPct + deltaLeftPct));
+                let newTop = Math.max(2, Math.min(98, startTopPct + deltaTopPct));
+
+                el.style.left = newLeft.toFixed(1) + '%';
+                el.style.top = newTop.toFixed(1) + '%';
+                el.style.transform = 'translate(-50%, -50%)';
+
+                if (el.id === 'cert-qr-wrap') {
+                    const sliderX = document.getElementById('qrPosX');
+                    const sliderY = document.getElementById('qrPosY');
+                    if (sliderX) sliderX.value = Math.round(newLeft);
+                    if (sliderY) sliderY.value = Math.round(newTop);
+                    const labelX = document.getElementById('qrPosX-val');
+                    const labelY = document.getElementById('qrPosY-val');
+                    if (labelX) labelX.textContent = Math.round(newLeft) + '%';
+                    if (labelY) labelY.textContent = Math.round(newTop) + '%';
+                }
+            }
+
+            function dragEnd() {
+                if (isDragging) {
+                    isDragging = false;
+                    el.classList.remove('is-dragging');
+                    window.removeEventListener('mousemove', dragMove);
+                    window.removeEventListener('touchmove', dragMove);
+                    window.removeEventListener('mouseup', dragEnd);
+                    window.removeEventListener('touchend', dragEnd);
+                }
+            }
+        });
+    }
+
+    /* ── Reset Posisi Tata Letak ── */
+    function resetCertLayout() {
+        const defaults = {
+            '.cert-title-main': { top: '18%', left: '50%' },
+            '#prev-nomor': { top: '25%', left: '50%' },
+            '.cert-intro': { top: '32%', left: '50%' },
+            '.cert-name-container': { top: '42%', left: '50%' },
+            '#prev-desc': { top: '53%', left: '50%' },
+            '#prev-judul': { top: '61%', left: '50%' },
+            '#prev-tanggal': { top: '69%', left: '50%' },
+            '#cert-signature-wrap': { top: '82%', left: '50%' },
+            '#cert-qr-wrap': { top: '84%', left: '10%' }
+        };
+
+        for (let selector in defaults) {
+            const el = document.querySelector(selector);
+            if (el) {
+                el.style.top = defaults[selector].top;
+                el.style.left = defaults[selector].left;
+                el.style.transform = 'translate(-50%, -50%)';
+            }
+        }
+
         const sliderX = document.getElementById('qrPosX');
         const sliderY = document.getElementById('qrPosY');
-        
-        if (!qrWrap || !container || !sliderX || !sliderY) return;
-        
-        let isDragging = false;
-        let startX, startY;
-        let startLeft, startTop;
-        
-        qrWrap.style.cursor = 'move';
-        
-        qrWrap.addEventListener('mousedown', dragStart);
-        document.addEventListener('mousemove', drag);
-        document.addEventListener('mouseup', dragEnd);
-        
-        qrWrap.addEventListener('touchstart', dragStart, { passive: false });
-        document.addEventListener('touchmove', drag, { passive: false });
-        document.addEventListener('touchend', dragEnd);
-        
-        function dragStart(e) {
-            // Get current percentage positions
-            const rect = qrWrap.getBoundingClientRect();
-            const parentRect = container.getBoundingClientRect();
-            
-            startLeft = ((rect.left - parentRect.left) / parentRect.width) * 100;
-            startTop = ((rect.top - parentRect.top) / parentRect.height) * 100;
-
-            if (e.type === 'touchstart') {
-                startX = e.touches[0].clientX;
-                startY = e.touches[0].clientY;
-            } else {
-                startX = e.clientX;
-                startY = e.clientY;
-            }
-            
-            isDragging = true;
-        }
-        
-        function drag(e) {
-            if (!isDragging) return;
-            
-            let clientX, clientY;
-            if (e.type === 'touchmove') {
-                clientX = e.touches[0].clientX;
-                clientY = e.touches[0].clientY;
-            } else {
-                clientX = e.clientX;
-                clientY = e.clientY;
-            }
-            
-            const deltaX = clientX - startX;
-            const deltaY = clientY - startY;
-            
-            const parentRect = container.getBoundingClientRect();
-            
-            const deltaLeftPct = (deltaX / parentRect.width) * 100;
-            const deltaTopPct = (deltaY / parentRect.height) * 100;
-            
-            let newLeft = Math.max(0, Math.min(95, startLeft + deltaLeftPct));
-            let newTop = Math.max(0, Math.min(95, startTop + deltaTopPct));
-            
-            qrWrap.style.left = newLeft.toFixed(1) + '%';
-            qrWrap.style.top = newTop.toFixed(1) + '%';
-            qrWrap.style.bottom = 'auto';
-            
-            sliderX.value = Math.round(newLeft);
-            sliderY.value = Math.round(newTop);
-            
-            document.getElementById('qrPosX-val').textContent = Math.round(newLeft) + '%';
-            document.getElementById('qrPosY-val').textContent = Math.round(newTop) + '%';
-        }
-        
-        function dragEnd() {
-            isDragging = false;
-        }
+        if (sliderX) sliderX.value = 10;
+        if (sliderY) sliderY.value = 84;
+        const labelX = document.getElementById('qrPosX-val');
+        const labelY = document.getElementById('qrPosY-val');
+        if (labelX) labelX.textContent = '10%';
+        if (labelY) labelY.textContent = '84%';
     }
 
     /* ── Filter tabel ── */
@@ -1935,9 +2208,9 @@
             });
         }
         
-        // Initialize QR positioning and draggable behavior
+        // Initialize positioning and draggable behavior for all canvas elements
         adjustQrPosition();
-        makeQrDraggable();
+        makeAllElementsDraggable();
 
         // Auto-select student's approved certificate and template if ?id= is set
         const urlParams = new URLSearchParams(window.location.search);

@@ -648,6 +648,7 @@
     .badge-abs-3 { top: 38%; left: 46%; }
     .badge-abs-4 { top: 50%; right: 6%; }
     .badge-abs-5 { top: 12%; left: 70%; }
+    .badge-abs-6 { top: 26%; right: 22%; }
     .org-bg-orange::after {
       content: "";
       position: absolute;
@@ -1767,6 +1768,12 @@
               <div class="badge-icon-orange"><i class="fas fa-users"></i></div>
               <div><strong><?= htmlspecialchars($hero_text['card2_title'] ?? 'Ikatan Alumni') ?></strong><br><?= htmlspecialchars($hero_text['card2_sub'] ?? 'Jaringan profesional & karir') ?></div>
             </div>
+
+            <a href="<?= base_url('pedoman') ?>" class="floating-card badge-abs-6" style="text-decoration: none; color: inherit; cursor: pointer;">
+              <div class="badge-icon-orange"><i class="fas fa-book"></i></div>
+              <div><strong>PEDOMAN</strong><br>Peraturan &amp; Ketentuan</div>
+            </a>
+
       <div class="floating-card badge-abs-3">
               <div class="badge-icon-orange"><i class="fas fa-sign-in-alt"></i></div>
               <div><strong><?= htmlspecialchars($hero_text['card3_title'] ?? 'Log in') ?></strong><br><?= htmlspecialchars($hero_text['card3_sub'] ?? 'Dashboard interaktif') ?></div>
