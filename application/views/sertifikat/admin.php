@@ -1576,6 +1576,10 @@
                             <i class="fas fa-info-circle me-2"></i>
                             Format kolom Excel/CSV yang wajib ada di baris pertama: <strong>NO, NAMA, NIM, JURUSAN, JABATAN</strong>.
                             <br><em>* Jika NIM mahasiswa belum terdaftar di sistem, akun mahasiswa baru akan otomatis dibuat dengan password default = NIM.</em>
+                            <hr style="margin: 8px 0; border-top: 1px dashed #bbf7d0;">
+                            <a href="<?= base_url('sertifikat/download_template') ?>" class="btn btn-xs btn-outline-success text-success fw-bold" style="padding: 2px 8px; font-size: 0.75rem; border-radius: 4px; text-decoration: none; border: 1px solid #27ae60; background: white; transition: all 0.2s; display: inline-block;">
+                                <i class="fas fa-download me-1"></i> Download Template Excel/CSV
+                            </a>
                         </div>
                         <div class="row g-3">
                             <!-- File Excel -->

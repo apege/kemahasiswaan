@@ -1062,4 +1062,65 @@ public function download_export($id)
         $this->session->set_flashdata('success', 'Tanda tangan berhasil dihapus!');
         redirect('sertifikat/tanda_tangan');
     }
+
+    // Download Template Excel/CSV untuk Import Penerima Sertifikat
+    public function download_template()
+    {
+        // Set headers for download as XLS
+        header('Content-Type: application/vnd.ms-excel; charset=utf-8');
+        header('Content-Disposition: attachment; filename=template_import_penerima.xls');
+        header('Cache-Control: max-age=0');
+
+        // Output stylized HTML for Excel
+        echo '
+        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+        <head>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+            <style>
+                body { font-family: \'Segoe UI\', Arial, sans-serif; margin: 0; padding: 20px; }
+                table { border-collapse: collapse; width: 100%; }
+                th { background-color: #10b981; color: #ffffff; font-weight: bold; border: 1px solid #059669; padding: 10px 8px; text-align: center; font-size: 11pt; }
+                td { border: 1px solid #d1d5db; padding: 8px; font-size: 10pt; color: #1f2937; }
+                .title-row { background-color: #ecfdf5; color: #065f46; font-size: 14pt; font-weight: bold; text-align: center; padding: 15px; border: 1px solid #a7f3d0; }
+                .desc-row { background-color: #f9fafb; color: #4b5563; font-size: 9pt; font-style: italic; text-align: center; padding: 8px; border: 1px solid #e5e7eb; }
+                .text-center { text-align: center; }
+                /* Force Excel to format NIM as text to prevent dropping leading zeros */
+                .txt-format { mso-number-format:\'@\'; }
+            </style>
+        </head>
+        <body>
+            <table>
+                <tr>
+                    <td colspan="5" class="title-row">TEMPLATE IMPORT DATA PENERIMA SERTIFIKAT</td>
+                </tr>
+                <tr>
+                    <td colspan="5" class="desc-row">PETUNJUK: Isi data mulai dari baris ke-5. Jangan mengubah nama/urutan kolom di baris ke-4. Kolom NIM akan otomatis terbaca sebagai teks.</td>
+                </tr>
+                <tr><td colspan="5" style="border:none; height:15px;"></td></tr>
+                <tr>
+                    <th style="width: 60px;">NO</th>
+                    <th style="width: 250px;">NAMA</th>
+                    <th style="width: 150px;">NIM</th>
+                    <th style="width: 200px;">JURUSAN</th>
+                    <th style="width: 200px;">JABATAN</th>
+                </tr>
+                <tr>
+                    <td class="text-center">1</td>
+                    <td>Ahmad Muzakki</td>
+                    <td class="txt-format text-center">1301210001</td>
+                    <td>Teknik Informatika</td>
+                    <td>Ketua Himpunan</td>
+                </tr>
+                <tr>
+                    <td class="text-center">2</td>
+                    <td>Siti Aminah</td>
+                    <td class="txt-format text-center">0301210002</td>
+                    <td>Sistem Informasi</td>
+                    <td>Anggota Himpunan</td>
+                </tr>
+            </table>
+        </body>
+        </html>';
+        exit;
+    }
 }
