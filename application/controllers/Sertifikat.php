@@ -5,7 +5,7 @@ class Sertifikat extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('Sertifikat_model');
+        $this->load->model(['Sertifikat_model', 'Signature_model']);
         $this->load->library(['session', 'form_validation', 'upload']);
         $this->load->helper(['url', 'form']);
 
@@ -143,6 +143,9 @@ class Sertifikat extends CI_Controller
         }
     }
 
+    // Fetch all signatures
+    $signatures = $this->Signature_model->get_all();
+
     $data = [
         'title' => 'Manajemen Pengajuan Sertifikat',
         'pengajuan_list' => $pengajuan_list,
@@ -151,6 +154,7 @@ class Sertifikat extends CI_Controller
         'search' => $search,
         'mahasiswa_list' => $mahasiswa_list,
         'custom_templates' => $custom_files,
+        'signatures' => $signatures,
         'flash_success' => $this->session->flashdata('success'),
         'flash_error' => $this->session->flashdata('error')
     ];
@@ -243,33 +247,65 @@ public function update_status()
         
 
 
-        // Handle Signature Upload
-        if (empty($_FILES['signature_file']['name'])) {
-            echo json_encode(['status' => 'error', 'message' => 'Gambar tanda tangan wajib diunggah.']);
-            return;
-        }
+        // Handle Signature Upload, Saved Signature, or Drawn Signature
+        $signature_id   = $this->input->post('signature_id', TRUE);
+        $signature_data = $this->input->post('signature_data', FALSE); // Don't filter HTML characters since it is base64
 
-        $allowed_types = ['image/png', 'image/jpeg', 'image/jpg'];
-        $sig_file_type = $_FILES['signature_file']['type'];
-        if (!in_array($sig_file_type, $allowed_types)) {
-            echo json_encode(['status' => 'error', 'message' => 'Tipe file tanda tangan tidak didukung. Gunakan PNG/JPG.']);
-            return;
-        }
+        if (!empty($signature_id)) {
+            $sig = $this->Signature_model->get_by_id($signature_id);
+            if (!$sig) {
+                echo json_encode(['status' => 'error', 'message' => 'Tanda tangan tersimpan tidak ditemukan.']);
+                return;
+            }
+            $extra['signature_image'] = $sig['image_path'];
+        } elseif (!empty($signature_data)) {
+            // Decoded base64 image data
+            $signature_data = str_replace('data:image/png;base64,', '', $signature_data);
+            $signature_data = str_replace(' ', '+', $signature_data);
+            $data_decoded   = base64_decode($signature_data);
 
-        $sig_dir = FCPATH . 'uploads/sertifikat/signatures/';
-        if (!is_dir($sig_dir)) {
-            mkdir($sig_dir, 0755, true);
-        }
+            $sig_dir = FCPATH . 'uploads/sertifikat/signatures/';
+            if (!is_dir($sig_dir)) {
+                mkdir($sig_dir, 0755, true);
+            }
 
-        $sig_ext       = strtolower(pathinfo($_FILES['signature_file']['name'], PATHINFO_EXTENSION));
-        $sig_safe_name = 'sig_' . $id . '_' . date('YmdHis') . '_' . uniqid() . '.' . $sig_ext;
-        $sig_dest      = $sig_dir . $sig_safe_name;
+            $sig_safe_name = 'sig_draw_' . $id . '_' . date('YmdHis') . '_' . uniqid() . '.png';
+            $sig_dest      = $sig_dir . $sig_safe_name;
 
-        if (!move_uploaded_file($_FILES['signature_file']['tmp_name'], $sig_dest)) {
-            echo json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file tanda tangan ke server.']);
-            return;
+            if (file_put_contents($sig_dest, $data_decoded)) {
+                $extra['signature_image'] = 'uploads/sertifikat/signatures/' . $sig_safe_name;
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Gagal menyimpan hasil gambar tanda tangan.']);
+                return;
+            }
+        } else {
+            if (empty($_FILES['signature_file']['name'])) {
+                echo json_encode(['status' => 'error', 'message' => 'Gambar tanda tangan wajib diunggah atau digambar.']);
+                return;
+            }
+
+            $allowed_types = ['image/png', 'image/jpeg', 'image/jpg'];
+            $sig_file_type = $_FILES['signature_file']['type'];
+            if (!in_array($sig_file_type, $allowed_types)) {
+                echo json_encode(['status' => 'error', 'message' => 'Tipe file tanda tangan tidak didukung. Gunakan PNG/JPG.']);
+                return;
+            }
+
+            $sig_dir = FCPATH . 'uploads/sertifikat/signatures/';
+            if (!is_dir($sig_dir)) {
+                mkdir($sig_dir, 0755, true);
+            }
+
+            $sig_ext       = strtolower(pathinfo($_FILES['signature_file']['name'], PATHINFO_EXTENSION));
+            $sig_safe_name = 'sig_' . $id . '_' . date('YmdHis') . '_' . uniqid() . '.' . $sig_ext;
+            $sig_dest      = $sig_dir . $sig_safe_name;
+
+            if (!move_uploaded_file($_FILES['signature_file']['tmp_name'], $sig_dest)) {
+                echo json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file tanda tangan ke server.']);
+                return;
+            }
+            $extra['signature_image'] = 'uploads/sertifikat/signatures/' . $sig_safe_name;
         }
-        $extra['signature_image'] = 'uploads/sertifikat/signatures/' . $sig_safe_name;
 
         // Handle QR Code
         $qr_method = $this->input->post('qr_method', TRUE);
@@ -844,5 +880,186 @@ public function download_export($id)
         } else {
             echo json_encode(['status' => 'success', 'message' => "Berhasil mengimport {$success_count} data penerima sertifikat!"]);
         }
+    }
+
+    // Halaman Dashboard Manajemen Tanda Tangan
+    public function tanda_tangan()
+    {
+        $this->_check_admin();
+
+        $data = [
+            'title'      => 'Manajemen Tanda Tangan',
+            'signatures' => $this->Signature_model->get_all()
+        ];
+
+        $this->load->view('sertifikat/tanda_tangan', $data);
+    }
+
+    // Aksi Simpan Tanda Tangan
+    public function tanda_tangan_simpan()
+    {
+        $this->_check_admin();
+
+        $nama           = $this->input->post('nama', TRUE);
+        $jabatan        = $this->input->post('jabatan', TRUE);
+        $signature_data = $this->input->post('signature_data', FALSE);
+
+        if (empty($nama) || empty($jabatan)) {
+            $this->session->set_flashdata('error', 'Nama dan Jabatan wajib diisi.');
+            redirect('sertifikat/tanda_tangan');
+        }
+
+        $image_path = '';
+
+        if (!empty($signature_data)) {
+            // Decode base64
+            $signature_data = str_replace('data:image/png;base64,', '', $signature_data);
+            $signature_data = str_replace(' ', '+', $signature_data);
+            $data_decoded   = base64_decode($signature_data);
+
+            $sig_dir = FCPATH . 'uploads/sertifikat/signatures/';
+            if (!is_dir($sig_dir)) {
+                mkdir($sig_dir, 0755, true);
+            }
+
+            $sig_safe_name = 'sig_master_' . date('YmdHis') . '_' . uniqid() . '.png';
+            $sig_dest      = $sig_dir . $sig_safe_name;
+
+            if (file_put_contents($sig_dest, $data_decoded)) {
+                $image_path = 'uploads/sertifikat/signatures/' . $sig_safe_name;
+            } else {
+                $this->session->set_flashdata('error', 'Gagal menyimpan hasil gambar tanda tangan.');
+                redirect('sertifikat/tanda_tangan');
+            }
+        } else {
+            if (empty($_FILES['signature_file']['name'])) {
+                $this->session->set_flashdata('error', 'File tanda tangan wajib diunggah atau digambar.');
+                redirect('sertifikat/tanda_tangan');
+            }
+
+            $sig_dir = FCPATH . 'uploads/sertifikat/signatures/';
+            if (!is_dir($sig_dir)) {
+                mkdir($sig_dir, 0755, true);
+            }
+
+            $sig_ext       = strtolower(pathinfo($_FILES['signature_file']['name'], PATHINFO_EXTENSION));
+            $sig_safe_name = 'sig_master_' . date('YmdHis') . '_' . uniqid() . '.' . $sig_ext;
+            $sig_dest      = $sig_dir . $sig_safe_name;
+
+            if (move_uploaded_file($_FILES['signature_file']['tmp_name'], $sig_dest)) {
+                $image_path = 'uploads/sertifikat/signatures/' . $sig_safe_name;
+            } else {
+                $this->session->set_flashdata('error', 'Gagal menyimpan file tanda tangan.');
+                redirect('sertifikat/tanda_tangan');
+            }
+        }
+
+        if (!empty($image_path)) {
+            $insert_data = [
+                'nama'       => $nama,
+                'jabatan'    => $jabatan,
+                'image_path' => $image_path
+            ];
+            $this->Signature_model->insert($insert_data);
+            $this->session->set_flashdata('success', 'Tanda tangan berhasil ditambahkan!');
+        }
+
+        redirect('sertifikat/tanda_tangan');
+    }
+
+    // Aksi Update Tanda Tangan
+    public function tanda_tangan_update()
+    {
+        $this->_check_admin();
+
+        $id      = (int) $this->input->post('id');
+        $nama    = $this->input->post('nama', TRUE);
+        $jabatan = $this->input->post('jabatan', TRUE);
+
+        $sig = $this->Signature_model->get_by_id($id);
+        if (!$sig) {
+            $this->session->set_flashdata('error', 'Tanda tangan tidak ditemukan.');
+            redirect('sertifikat/tanda_tangan');
+        }
+
+        if (empty($nama) || empty($jabatan)) {
+            $this->session->set_flashdata('error', 'Nama dan Jabatan wajib diisi.');
+            redirect('sertifikat/tanda_tangan');
+        }
+
+        $update_data = [
+            'nama'    => $nama,
+            'jabatan' => $jabatan
+        ];
+
+        // Jika ada file tanda tangan baru
+        if (!empty($_FILES['signature_file']['name'])) {
+            $sig_dir = FCPATH . 'uploads/sertifikat/signatures/';
+            if (!is_dir($sig_dir)) {
+                mkdir($sig_dir, 0755, true);
+            }
+
+            $sig_ext       = strtolower(pathinfo($_FILES['signature_file']['name'], PATHINFO_EXTENSION));
+            $sig_safe_name = 'sig_master_' . date('YmdHis') . '_' . uniqid() . '.' . $sig_ext;
+            $sig_dest      = $sig_dir . $sig_safe_name;
+
+            if (move_uploaded_file($_FILES['signature_file']['tmp_name'], $sig_dest)) {
+                // Hapus file lama jika ada
+                if (!empty($sig['image_path']) && file_exists(FCPATH . $sig['image_path'])) {
+                    @unlink(FCPATH . $sig['image_path']);
+                }
+                $update_data['image_path'] = 'uploads/sertifikat/signatures/' . $sig_safe_name;
+            }
+        } else {
+            $signature_data = $this->input->post('signature_data', FALSE);
+            if (!empty($signature_data)) {
+                // Decode base64
+                $signature_data = str_replace('data:image/png;base64,', '', $signature_data);
+                $signature_data = str_replace(' ', '+', $signature_data);
+                $data_decoded   = base64_decode($signature_data);
+
+                $sig_dir = FCPATH . 'uploads/sertifikat/signatures/';
+                if (!is_dir($sig_dir)) {
+                    mkdir($sig_dir, 0755, true);
+                }
+
+                $sig_safe_name = 'sig_master_' . date('YmdHis') . '_' . uniqid() . '.png';
+                $sig_dest      = $sig_dir . $sig_safe_name;
+
+                if (file_put_contents($sig_dest, $data_decoded)) {
+                    // Hapus file lama jika ada
+                    if (!empty($sig['image_path']) && file_exists(FCPATH . $sig['image_path'])) {
+                        @unlink(FCPATH . $sig['image_path']);
+                    }
+                    $update_data['image_path'] = 'uploads/sertifikat/signatures/' . $sig_safe_name;
+                }
+            }
+        }
+
+        $this->Signature_model->update($id, $update_data);
+        $this->session->set_flashdata('success', 'Tanda tangan berhasil diperbarui!');
+        redirect('sertifikat/tanda_tangan');
+    }
+
+    // Aksi Hapus Tanda Tangan
+    public function tanda_tangan_hapus($id)
+    {
+        $this->_check_admin();
+
+        $id  = (int) $id;
+        $sig = $this->Signature_model->get_by_id($id);
+        if (!$sig) {
+            $this->session->set_flashdata('error', 'Tanda tangan tidak ditemukan.');
+            redirect('sertifikat/tanda_tangan');
+        }
+
+        // Hapus file dari server
+        if (!empty($sig['image_path']) && file_exists(FCPATH . $sig['image_path'])) {
+            @unlink(FCPATH . $sig['image_path']);
+        }
+
+        $this->Signature_model->delete($id);
+        $this->session->set_flashdata('success', 'Tanda tangan berhasil dihapus!');
+        redirect('sertifikat/tanda_tangan');
     }
 }

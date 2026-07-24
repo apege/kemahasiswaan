@@ -731,8 +731,21 @@
 
 
 
-                    <!-- Upload Tanda Tangan (Drag & Drop) -->
+                    <!-- Pilihan Tanda Tangan Tersimpan -->
                     <div class="mb-3">
+                        <label class="form-label fw-bold">Pilih Tanda Tangan Tersimpan (Opsional)</label>
+                        <select class="form-select" id="signatureSelect" onchange="previewSavedSignature()" style="border-radius: 8px;">
+                            <option value="">-- Unggah file baru saja (seret/pilih di bawah) --</option>
+                            <?php if (!empty($signatures)): ?>
+                                <?php foreach ($signatures as $sig): ?>
+                                    <option value="<?= $sig['id'] ?>" data-image="<?= base_url($sig['image_path']) ?>"><?= htmlspecialchars($sig['nama']) ?> (<?= htmlspecialchars($sig['jabatan'] ?? '-') ?>)</option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                    </div>
+
+                    <!-- Upload Tanda Tangan (Drag & Drop) -->
+                    <div class="mb-3" id="sigUploadContainer">
                         <label class="form-label font-weight-bold">Gambar Tanda Tangan (PNG/JPG) <span class="text-danger">*</span></label>
                         <div id="sigDropZone" class="border border-2 border-dashed rounded-3 p-4 text-center cursor-pointer mb-2" style="border-style: dashed !important; border-color: #f97316 !important; background: #fffaf0; transition: all 0.2s; border-radius: 12px;">
                             <i class="fas fa-signature fa-2x text-warning mb-2" style="color: #f97316 !important;"></i>
@@ -741,13 +754,15 @@
                             <button type="button" class="btn btn-sm btn-warning text-white px-3" onclick="document.getElementById('approveSignature').click()" style="border-radius: 8px; background-color: #f97316; border: none;">Pilih File</button>
                             <input type="file" id="approveSignature" accept="image/png, image/jpeg, image/jpg" style="display: none;" onchange="previewUploadedSignature(this)">
                         </div>
-                        <div id="sigPreviewContainer" style="display: none; background:#f8f9fa; border-radius:12px; padding:16px; text-align:center;" class="mb-2">
-                            <img id="sigPreviewImg" style="max-height: 80px; max-width: 100%; border-radius: 8px;" alt="Preview Tanda Tangan">
-                            <p class="text-muted mt-2 small mb-0">Preview Tanda Tangan</p>
-                        </div>
                         <small class="text-muted">Format file gambar: PNG/JPG (transparan direkomendasikan).</small>
-                        <div class="text-danger" id="signatureError" style="display: none;">Gambar tanda tangan wajib diunggah</div>
                     </div>
+
+                    <!-- Preview Area for Saved / Uploaded -->
+                    <div id="sigPreviewContainer" style="display: none; background:#f8f9fa; border-radius:12px; padding:16px; text-align:center;" class="mb-2">
+                        <img id="sigPreviewImg" style="max-height: 80px; max-width: 100%; border-radius: 8px;" alt="Preview Tanda Tangan">
+                        <p class="text-muted mt-2 small mb-0">Preview Tanda Tangan</p>
+                    </div>
+                    <div class="text-danger" id="signatureError" style="display: none;">Gambar tanda tangan wajib diunggah</div>
 
                     <div class="mb-3">
                         <label class="form-label">Catatan (Opsional)</label>
@@ -1017,6 +1032,10 @@
             document.getElementById('sigPreviewContainer').style.display = 'none';
             document.getElementById('sigPreviewImg').src = '';
             document.getElementById('signatureError').style.display = 'none';
+            const sigSelect = document.getElementById('signatureSelect');
+            if (sigSelect) {
+                sigSelect.value = '';
+            }
 
             // Reset method to generate
             document.getElementById('qrMethodGenerate').checked = true;
@@ -1065,6 +1084,26 @@
                 previewDiv.style.display = 'block';
             }
             reader.readAsDataURL(file);
+        }
+
+
+
+        function previewSavedSignature() {
+            const select = document.getElementById('signatureSelect');
+            const selectedOption = select.options[select.selectedIndex];
+            const errorDiv = document.getElementById('signatureError');
+            const previewDiv = document.getElementById('sigPreviewContainer');
+            const previewImg = document.getElementById('sigPreviewImg');
+
+            if (!selectedOption || !selectedOption.value) {
+                previewDiv.style.display = 'none';
+                return;
+            }
+
+            errorDiv.style.display = 'none';
+            const imageUrl = selectedOption.getAttribute('data-image');
+            previewImg.src = imageUrl;
+            previewDiv.style.display = 'block';
         }
 
         // Preview local QR Image on Canvas
@@ -1243,13 +1282,20 @@
             }
 
             // Tanda Tangan validation
+            const select = document.getElementById('signatureSelect');
+            const signatureId = select.value;
             const sigInput = document.getElementById('approveSignature');
-            if (sigInput.files.length === 0) {
-                document.getElementById('signatureError').style.display = 'block';
-                return;
+            let signatureFile = null;
+
+            if (!signatureId) {
+                if (sigInput.files.length === 0) {
+                    document.getElementById('signatureError').textContent = 'Gambar tanda tangan wajib diunggah atau pilih tanda tangan tersimpan';
+                    document.getElementById('signatureError').style.display = 'block';
+                    return;
+                }
+                signatureFile = sigInput.files[0];
             }
             document.getElementById('signatureError').style.display = 'none';
-            const signatureFile = sigInput.files[0];
 
             const isBrowse = document.getElementById('qrMethodBrowse').checked;
             let qrFile = null;
@@ -1274,7 +1320,11 @@
             formData.append('id', currentId);
             formData.append('action', 'approve');
             formData.append('nomor_sertifikat', nomor);
-            formData.append('signature_file', signatureFile);
+            if (signatureId) {
+                formData.append('signature_id', signatureId);
+            } else {
+                formData.append('signature_file', signatureFile);
+            }
             formData.append('catatan', document.getElementById('catatanApprove').value.trim());
             formData.append('qr_method', isBrowse ? 'browse' : 'generate');
 

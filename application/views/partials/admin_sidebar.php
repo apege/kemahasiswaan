@@ -356,14 +356,18 @@ $nama   = $this->session->userdata('nama') ?? 'Admin';
             <span>Beasiswa</span>
         </a>
 
-        <a href="<?= base_url('sertifikat/admin') ?>" class="<?= ($active === 'sertifikat' || $active === 'sertifikat_generate' || $active === 'sertifikat_excel') ? 'active' : '' ?>">
+        <a href="<?= base_url('sertifikat/admin') ?>" class="<?= ($active === 'sertifikat' || $active === 'sertifikat_generate' || $active === 'sertifikat_excel' || $active === 'sertifikat_ttd') ? 'active' : '' ?>">
             <i class="fas fa-certificate menu-icon"></i>
             <span>Sertifikat</span>
         </a>
-        <?php if ($active === 'sertifikat' || $active === 'sertifikat_generate' || $active === 'sertifikat_excel'): ?>
+        <?php if ($active === 'sertifikat' || $active === 'sertifikat_generate' || $active === 'sertifikat_excel' || $active === 'sertifikat_ttd'): ?>
         <a href="<?= base_url('sertifikat/generate') ?>" class="<?= ($active === 'sertifikat_generate') ? 'active' : '' ?>" style="padding-left: 2.5rem; font-size: 0.82rem;">
             <i class="fas fa-magic menu-icon"></i>
             <span>Generate Sertifikat</span>
+        </a>
+        <a href="<?= base_url('sertifikat/tanda_tangan') ?>" class="<?= ($active === 'sertifikat_ttd') ? 'active' : '' ?>" style="padding-left: 2.5rem; font-size: 0.82rem;">
+            <i class="fas fa-signature menu-icon"></i>
+            <span>Tanda Tangan</span>
         </a>
         <a href="<?= base_url('sertifikat/export_excel_canva') ?>" class="<?= ($active === 'sertifikat_excel') ? 'active' : '' ?>" style="padding-left: 2.5rem; font-size: 0.82rem;">
             <i class="fas fa-file-excel menu-icon"></i>
