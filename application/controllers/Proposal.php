@@ -354,37 +354,47 @@ class Proposal extends CI_Controller
         $this->_generate_pdf($html, $filename, 'download');
     }
 
-    /* ==================== HELPER: Generate PDF dengan Dompdf ==================== */
     private function _generate_pdf($html, $filename, $mode = 'inline')
     {
-        // Load Dompdf via Composer
-        require_once APPPATH . '../vendor/autoload.php';
-
-        $options = new \Dompdf\Options();
-        $options->set('defaultFont', 'DejaVu Sans');
-        $options->set('isHtml5ParserEnabled', true);
-        $options->set('isRemoteEnabled', true);       // Izinkan load gambar dari URL
-        $options->set('chroot', FCPATH);              // Izinkan akses file lokal (assets)
-        $options->set('isPhpEnabled', false);
-
-        $dompdf = new \Dompdf\Dompdf($options);
-        $dompdf->loadHtml($html, 'UTF-8');
-        $dompdf->setPaper('A4', 'portrait');
-        $dompdf->render();
-
-        // Simpan ke file agar bisa diakses ulang (opsional)
-        $output_dir = FCPATH . 'uploads/proposal_pdf/';
-        if (!is_dir($output_dir)) mkdir($output_dir, 0755, true);
-
-        file_put_contents($output_dir . $filename . '.pdf', $dompdf->output());
-
-        // Stream ke browser
-        if ($mode === 'download') {
-            $dompdf->stream($filename . '.pdf', ['Attachment' => true]);
-        } else {
-            $dompdf->stream($filename . '.pdf', ['Attachment' => false]);
+        $autoload_path = APPPATH . '../vendor/autoload.php';
+        if (!file_exists($autoload_path)) {
+            show_error('Library PDF (Dompdf) belum ter-install di server. Jalankan command <code>composer install</code> di terminal.', 500, 'Vendor Dependencies Missing');
+            return;
         }
-        exit;
+
+        require_once $autoload_path;
+
+        try {
+            $options = new \Dompdf\Options();
+            $options->set('defaultFont', 'DejaVu Sans');
+            $options->set('isHtml5ParserEnabled', true);
+            $options->set('isRemoteEnabled', true);       // Izinkan load gambar dari URL
+            $options->set('chroot', FCPATH);              // Izinkan akses file lokal (assets)
+            $options->set('isPhpEnabled', false);
+
+            $dompdf = new \Dompdf\Dompdf($options);
+            $dompdf->loadHtml($html, 'UTF-8');
+            $dompdf->setPaper('A4', 'portrait');
+            $dompdf->render();
+
+            // Simpan ke file agar bisa diakses ulang (opsional)
+            $output_dir = FCPATH . 'uploads/proposal_pdf/';
+            if (!is_dir($output_dir)) {
+                mkdir($output_dir, 0755, true);
+            }
+
+            @file_put_contents($output_dir . $filename . '.pdf', $dompdf->output());
+
+            // Stream ke browser
+            if ($mode === 'download') {
+                $dompdf->stream($filename . '.pdf', ['Attachment' => true]);
+            } else {
+                $dompdf->stream($filename . '.pdf', ['Attachment' => false]);
+            }
+            exit;
+        } catch (\Exception $e) {
+            show_error('Gagal membuat file PDF: ' . $e->getMessage(), 500, 'PDF Generation Error');
+        }
     }
 
     /* ==================== UPLOAD FILE ==================== */
