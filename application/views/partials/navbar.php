@@ -413,6 +413,7 @@ if ($is_logged_in) {
 }
 .sidebar-close { display: none; }
 .sidebar-account { display: none; }
+.sidebar-account-logout { display: none; }
 @media (max-width: 1024px) {
   .dropdown-menu-custom { min-width: unset; width: 90vw; max-width: 600px; left: 50%; transform: translateX(-50%) translateY(-12px); padding: 12px; }
   .nav-item-dropdown.open .dropdown-menu-custom { transform: translateX(-50%) translateY(0) !important; }
@@ -523,6 +524,27 @@ if ($is_logged_in) {
     background: rgba(255,255,255,0.06);
   }
   .sidebar-account:hover { background: rgba(249, 115, 22, 0.3); border-color: #f97316; }
+  .sidebar-account-logout {
+    display: flex;
+    padding: 12px 16px;
+    border-radius: 12px;
+    color: #ff7675 !important;
+    text-decoration: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    margin-top: 8px;
+    border: 1px solid rgba(231, 76, 60, 0.35);
+    background: rgba(231, 76, 60, 0.15);
+    transition: all 0.2s ease;
+  }
+  .sidebar-account-logout:hover {
+    background: #e74c3c;
+    color: #ffffff !important;
+    border-color: #e74c3c;
+  }
   .nav-links > a,
   .nav-item-dropdown > a {
     padding: 14px 16px;
@@ -831,6 +853,9 @@ section, .org-bg-orange, .alumni-quote-section, .partner-section, .recognition-s
                             <i class="fas fa-user-circle"></i>
                         <?php endif; ?>
                         <?= htmlspecialchars($user_nama) ?>
+                    </a>
+                    <a href="<?= base_url('logout') ?>" class="sidebar-account-logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
                     </a>
                 <?php else: ?>
                     <a href="<?= base_url('login') ?>" class="btn-mytelu-custom sidebar-account">
